@@ -4,6 +4,8 @@
  */
 package dacn_quanly;
 
+import test.frmChooseImage;
+
 /**
  *
  * @author WitherDragon
@@ -14,7 +16,8 @@ public class DACN_QUANLY {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        frmChooseImage frm=new frmChooseImage();
+        frm.setVisible(true);
     }
     
 }

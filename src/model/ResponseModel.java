@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.util.UUID;
 
 /**
@@ -11,23 +13,25 @@ import java.util.UUID;
  * @author WitherDragon
  */
 public class ResponseModel {
-    private UUID id;
+    private String id;
     private String apiVersion;
     private String message;
-    private Object data;
+    private JsonElement data;
+
+    public ResponseModel() {}
     
-    public ResponseModel(String message, Object data) {
-        this.id = UUID.randomUUID();
+    public ResponseModel(String message, JsonElement data) {
+        this.id = UUID.randomUUID().toString();
         this.apiVersion = "1.0";
         this.message = message;
         this.data = data;
     }
-
-    public UUID getId() {
+    
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -47,11 +51,11 @@ public class ResponseModel {
         this.message = message;
     }
 
-    public Object getData() {
+    public JsonElement getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(JsonElement data) {
         this.data = data;
     }
     

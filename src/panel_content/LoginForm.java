@@ -1,13 +1,5 @@
 package panel_content;
 
-import com.formdev.flatlaf.FlatClientProperties;
-import com.formdev.flatlaf.util.UIScale;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
-import javax.swing.JPanel;
 import main_frame.Application;
 
 /**

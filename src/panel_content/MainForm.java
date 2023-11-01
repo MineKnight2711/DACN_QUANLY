@@ -62,7 +62,7 @@ public class MainForm extends JLayeredPane {
             menuButton = new JButton();
         }
         String icon = (getComponentOrientation().isLeftToRight()) ? "menu_left.svg" : "menu_right.svg";
-        menuButton.setIcon(new FlatSVGIcon("raven/icon/svg/" + icon, 0.8f));
+        menuButton.setIcon(new FlatSVGIcon("src\\icons\\svg" + icon, 0.8f));
     }
 
     private void initMenuEvent() {

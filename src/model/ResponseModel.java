@@ -4,8 +4,6 @@
  */
 package model;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.util.UUID;
 
 /**
@@ -18,7 +16,9 @@ public class ResponseModel {
     private String message;
     private JsonElement data;
 
-    public ResponseModel() {}
+    public ResponseModel() {
+    
+    }
     
     public ResponseModel(String message, JsonElement data) {
         this.id = UUID.randomUUID().toString();

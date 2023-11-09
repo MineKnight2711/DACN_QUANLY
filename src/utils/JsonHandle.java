@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import model.Category;
+import model.LoginResponse;
 import model.ResponseModel;
 
 /**
@@ -25,7 +26,10 @@ public class JsonHandle {
     public ResponseModel getResponseFromJson(String responeJson){
         return gson.fromJson(responeJson, ResponseModel.class);
     }
-
+    public LoginResponse getLoginResponseFromJson(String loginResponeJson){
+        String uncappedJson=gson.fromJson(loginResponeJson, String.class);
+        return gson.fromJson(uncappedJson, LoginResponse.class);
+    }
     public List<Category> getListCategoryFromJson(String listJson){
         return gson.fromJson(listJson, new TypeToken<List<Category>>() {}.getType());
     }

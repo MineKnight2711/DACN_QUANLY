@@ -1,16 +1,18 @@
 package panel_content;
 
+import controller.AccountController;
 import main_frame.Application;
+import raven.toast.Notifications;
 
 /**
  *
  * @author Raven
  */
 public class LoginForm extends javax.swing.JPanel {
-
+    private AccountController accountController;
     public LoginForm() {
         initComponents();
-        
+        accountController=new AccountController();
    
 //        init();
     }
@@ -44,14 +46,14 @@ public class LoginForm extends javax.swing.JPanel {
         lbTitle = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        txtUser = new javax.swing.JTextField();
+        txtEmail = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         txtPass = new javax.swing.JPasswordField();
         disable = new javax.swing.JLabel();
         show = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
+        btnLogin = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         pnBannel = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
@@ -81,13 +83,13 @@ public class LoginForm extends javax.swing.JPanel {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setText("Username");
+        jLabel5.setText("Email");
         pnLoginInfo.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(34, 123, 341, -1));
 
-        txtUser.setFont(txtUser.getFont().deriveFont(txtUser.getFont().getSize()+2f));
-        txtUser.setForeground(new java.awt.Color(51, 51, 51));
-        txtUser.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
-        pnLoginInfo.add(txtUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, 360, 30));
+        txtEmail.setFont(txtEmail.getFont().deriveFont(txtEmail.getFont().getSize()+2f));
+        txtEmail.setForeground(new java.awt.Color(51, 51, 51));
+        txtEmail.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        pnLoginInfo.add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, 360, 30));
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         pnLoginInfo.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(335, 147, 40, 39));
@@ -125,17 +127,17 @@ public class LoginForm extends javax.swing.JPanel {
         jCheckBox1.setText("Remember Password");
         pnLoginInfo.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(34, 261, -1, -1));
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(102, 102, 102));
-        jButton1.setText("LOGIN");
-        jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnLogin.setForeground(new java.awt.Color(102, 102, 102));
+        btnLogin.setText("LOGIN");
+        btnLogin.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnLoginActionPerformed(evt);
             }
         });
-        pnLoginInfo.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 341, 40));
+        pnLoginInfo.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 341, 40));
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -199,9 +201,19 @@ public class LoginForm extends javax.swing.JPanel {
         show.setEnabled(false);
     }//GEN-LAST:event_showMouseClicked
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Application.login();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        
+        String result=accountController.signIn(txtEmail.getText(),new String(txtPass.getPassword()));
+        if(result.equals("Success")){
+            Notifications.getInstance().show(Notifications.Type.INFO, Notifications.Location.TOP_CENTER, "Đăng nhập thành công");
+            Application.login();
+        }
+        else{
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Đăng nhập thất bại");
+        }
+//        Application.login();
+        
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     private void lbExitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExitMouseClicked
         System.exit(0);
@@ -316,8 +328,8 @@ public class LoginForm extends javax.swing.JPanel {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLogin;
     private javax.swing.JLabel disable;
-    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -333,7 +345,7 @@ public class LoginForm extends javax.swing.JPanel {
     private javax.swing.JPanel pnBannel;
     private javax.swing.JPanel pnLoginInfo;
     private javax.swing.JLabel show;
+    private javax.swing.JTextField txtEmail;
     private javax.swing.JPasswordField txtPass;
-    private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
 }

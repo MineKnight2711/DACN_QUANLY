@@ -78,10 +78,10 @@ public class CategoryAPI {
         }
         return response.toString();
     }
-    public String getAllCategory(String apiUrl) {
+    public String getAllCategory() {
         StringBuilder response = new StringBuilder();
         try {
-            URL url = new URL(apiUrl);
+            URL url = new URL(BaseURL.BASE_URL+BaseURL.GET_ALL_CATEGORY_API);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

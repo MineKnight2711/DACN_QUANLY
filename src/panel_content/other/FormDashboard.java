@@ -13,6 +13,7 @@ public class FormDashboard extends javax.swing.JPanel {
         initComponents();
         lb.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$h1.font");
+        
     }
 
     @SuppressWarnings("unchecked")

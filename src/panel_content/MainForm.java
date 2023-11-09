@@ -19,7 +19,7 @@ import javax.swing.border.EmptyBorder;
 import main_frame.Application;
 import panel_content.other.FormDashboard;
 import panel_content.other.FormQuanLyNhanVien;
-import panel_content.other.FormRead;
+import panel_content.other.FormCategory;
 import menu.Menu;
 import menu.MenuAction;
 
@@ -74,7 +74,7 @@ public class MainForm extends JLayeredPane {
                 if (subIndex == 1) {
                     Application.showForm(new FormQuanLyNhanVien());
                 } else if (subIndex == 2) {
-                    Application.showForm(new FormRead());
+                    Application.showForm(new FormCategory());
                 } else {
                     action.cancel();
                 }

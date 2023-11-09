@@ -30,7 +30,7 @@ public class ImageLoader extends SwingWorker<ImageIcon, Void> {
         try {
             URL url = new URL(imageUrl);
             ImageIcon imageIcon = new ImageIcon(url);
-            Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_FAST);
             return new ImageIcon(scaledImage);
         } catch (IOException e) {
             e.printStackTrace();

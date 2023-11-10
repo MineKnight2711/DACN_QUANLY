@@ -1,4 +1,4 @@
-package main_frame;
+package application;
 
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
@@ -10,8 +10,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import panel_content.LoginForm;
-import panel_content.MainForm;
+import forms.LoginForm;
 import raven.toast.Notifications;
 
 public class Application extends javax.swing.JFrame {
@@ -28,7 +27,7 @@ public class Application extends javax.swing.JFrame {
         mainForm = new MainForm();
         loginForm = new LoginForm();
 //        loginForm1=new LoginForm1();
-        setContentPane(loginForm);
+        setContentPane(mainForm);
         Notifications.getInstance().setJFrame(this);
     }
 

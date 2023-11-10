@@ -1,4 +1,4 @@
-package panel_content;
+package application;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -16,10 +16,10 @@ import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import main_frame.Application;
-import panel_content.other.FormDashboard;
-import panel_content.other.FormQuanLyNhanVien;
-import panel_content.other.FormCategory;
+import application.Application;
+import forms.FormDashboard;
+import forms.FormQuanLyNhanVien;
+import forms.FormCategory;
 import menu.Menu;
 import menu.MenuAction;
 

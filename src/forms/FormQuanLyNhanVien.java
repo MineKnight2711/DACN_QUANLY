@@ -1,4 +1,4 @@
-package panel_content.other;
+package forms;
 
 
 /**

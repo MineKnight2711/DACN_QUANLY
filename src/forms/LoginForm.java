@@ -1,7 +1,7 @@
-package panel_content;
+package forms;
 
 import controller.AccountController;
-import main_frame.Application;
+import application.Application;
 import raven.toast.Notifications;
 
 /**

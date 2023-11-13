@@ -62,6 +62,9 @@ public class Application extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        spinnerUtils1 = new spinner_progress.SpinnerUtils();
+        spinnerProgressUI1 = new spinner_progress.SpinnerProgressUI();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -92,5 +95,7 @@ public class Application extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private spinner_progress.SpinnerProgressUI spinnerProgressUI1;
+    private spinner_progress.SpinnerUtils spinnerUtils1;
     // End of variables declaration//GEN-END:variables
 }

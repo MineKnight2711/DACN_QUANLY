@@ -23,12 +23,12 @@ import java.nio.file.Files;
  */
 public class CategoryAPI {
     
-    public String createCategory(String apiUrl, String categoryName, File imageFile) {
+    public String createCategory(String categoryName, File imageFile) {
         String LINE_FEED = "\r\n";
         String BOUNDARY = "boundary";
         StringBuilder response = new StringBuilder();
         try {
-            URL url = new URL(apiUrl);
+            URL url = new URL(BaseURL.BASE_URL+"category");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
@@ -81,7 +81,7 @@ public class CategoryAPI {
     public String getAllCategory() {
         StringBuilder response = new StringBuilder();
         try {
-            URL url = new URL(BaseURL.BASE_URL+BaseURL.GET_ALL_CATEGORY_API);
+            URL url = new URL(BaseURL.BASE_URL+"category");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

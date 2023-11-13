@@ -1,14 +1,20 @@
 package forms;
 
+import api.BaseURL;
+import com.google.gson.Gson;
 import controller.CategoryController;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,18 +27,28 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import model.Category;
+import model.ResponseModel;
+import raven.toast.Notifications;
 import utils.ImageLoader;
+import utils.JsonHandle;
+import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
 import utils.table.TableActionCellRender;
 import utils.table.TableActionEvent;
@@ -43,11 +59,14 @@ import utils.table.TableActionEvent;
  * @author Raven
  */
 public class FormCategory extends javax.swing.JPanel {
+    private File choosenFile;
     private CategoryController categoryController;
     private List<Category> categories;
+    private JsonHandle jsonHandle;
     public FormCategory() {
         initComponents();
         categoryController=new CategoryController();
+        jsonHandle=new JsonHandle();
         createTableLastColumnCellEvent();
         getAllCategory();
     }
@@ -85,7 +104,9 @@ public class FormCategory extends javax.swing.JPanel {
     private void refesh(){
         txtCategoryName.setText("");
         txtUrl.setText("");
-//        lbImage.setIcon(null);
+        lbImage.setIcon(null);
+        choosenFile=null;
+        categories=null;
         getAllCategory();
     }
      private void getAllCategory(){
@@ -99,44 +120,58 @@ public class FormCategory extends javax.swing.JPanel {
         if (!categories.isEmpty()) {
                 DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
                 model.setRowCount(0);
-                int numberOfCategories = categories.size();
+                int totalCategories = categories.size();
+
                 // Load categories first
                 for (Category cate : categories) {
+                  
                     String userID = cate.getCategoryID();
                     String imageID = cate.getCategoryName();
+                    SpinnerProgress progressBar=new SpinnerProgress();
+                    progressBar.setPreferredSize(new Dimension(50,50)); 
                     
-                    model.addRow(new Object[]{userID, imageID, null});
+                    model.addRow(new Object[]{userID, imageID, progressBar});
                 }
-                
+                createTableRowClick();
                 AtomicInteger count = new AtomicInteger(0);
                 
                 // Load images asynchronously
-                for (int i = 0; i < numberOfCategories; i++) {
+                for (int i = 0; i < totalCategories; i++) {
                     Category cate = categories.get(i);
                     String imageUrl = cate.getImageUrl();
-                    
+//                    progress++;
+//                    int progressPercent = (progress * 100) / totalCategories;
+//                    progressBar.setValue(progressPercent);
                     // Use a separate final variable
                     final int currentIndex = i;
                     
-                    ImageLoader imageLoader = new ImageLoader(imageUrl, 100, 100);
+                    ImageLoader imageLoader = new ImageLoader(imageUrl, 150, 150);
                     
                     imageLoader.addPropertyChangeListener(evt -> {
+                        int progress = imageLoader.getProgress();
+
+                        SpinnerProgress progressBar = (SpinnerProgress)model.getValueAt(currentIndex, 2);
+                        progressBar.setValue(progress);
+                        
+                        
                         if ("state".equals(evt.getPropertyName()) && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                             try {
                                 ImageIcon scaledImageIcon = imageLoader.get();
-                                
+                                 
                                 // Update the UI on the EDT
                                 SwingUtilities.invokeLater(() -> {
                                     model.setValueAt(scaledImageIcon, currentIndex, 2);
                                     
                                     int currentCount = count.incrementAndGet();
-                                    if (currentCount == numberOfCategories) {
+                                    if (currentCount == totalCategories) {
                                         // All images are loaded, do additional UI setup here
                                         TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
                                         imageColumn.setCellRenderer(new ImageRenderer());
                                         tbCategory.setRowSorter(new TableRowSorter<>(model));
-                                        tbCategory.setRowHeight(100);
-                                        createTableRowClick();
+                                        tbCategory.setRowHeight(150);
+                                        tbCategory.revalidate();
+                                        tbCategory.repaint();
+                                        
                                     }
                                 });
                                 
@@ -149,8 +184,8 @@ public class FormCategory extends javax.swing.JPanel {
                     imageLoader.execute();
                 }
                 TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
-                imageColumn.setCellRenderer(new GifRenderer());
-                tbCategory.setRowHeight(100);
+                imageColumn.setCellRenderer(new ImageRenderer());
+                tbCategory.setRowHeight(50);
         } else {
             JOptionPane.showMessageDialog(this, "Không có danh mục nào!", "Lỗi", 0);
         }
@@ -212,26 +247,27 @@ public class FormCategory extends javax.swing.JPanel {
 //        }
 //        
 //    }
-//    class ImageRenderer extends DefaultTableCellRenderer {
-//        @Override
-//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//            if (value instanceof Icon) {
-//                setIcon((Icon) value);
-//                setText(null); // Clear text
-//            } else if (value instanceof SpinnerProgress) {
-//                SpinnerProgress spinner = (SpinnerProgress) value; 
-//                spinner.setOpaque(true);
-//            spinner.repaint();
-//                return spinner;
-//            } else {
-//                setIcon(null); // Clear icon
-//                setText((value == null) ? "" : value.toString());
-//            }
-//
-//            setHorizontalAlignment(JLabel.CENTER);
-//            return this;
-//        }
-//    }
+    class ImageRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof Icon icon) {
+                setIcon(icon);
+                setText(null); // Clear text
+            } else if (value instanceof SpinnerProgress progressBar) { 
+                progressBar.setStringPainted(true); 
+                progressBar.setPreferredSize(new Dimension(50,50));
+                return progressBar;
+            } else {
+                setIcon(null); // Clear icon
+                setText((value == null) ? "" : value.toString());
+            }
+
+            setHorizontalAlignment(JLabel.CENTER);
+            return this;
+        }
+    }
+
+    
     private void createTableRowClick(){
         tbCategory.addMouseListener(new MouseAdapter(){
             @Override
@@ -245,48 +281,42 @@ public class FormCategory extends javax.swing.JPanel {
                         Category selectedCategory = categories.get(selectedRow);
                         txtCategoryName.setText(selectedCategory.getCategoryName());
                         txtUrl.setText(selectedCategory.getImageUrl());
-                        
-                        URL url =new URL(selectedCategory.getImageUrl());
-                        ImageIcon imageIcon = new ImageIcon(url);
-                        Image scaledImage = imageIcon.getImage().getScaledInstance(lbImage.getWidth(), lbImage.getHeight(), Image.SCALE_FAST);
-                        lbImage.setIcon(new ImageIcon(scaledImage));
-                    } catch (MalformedURLException ex) {
+
+                        ImageLoader loader = new ImageLoader(selectedCategory.getImageUrl(), lbImage.getWidth(), lbImage.getHeight());
+                        loader.execute();
+
+                        loader.addPropertyChangeListener(evt -> {
+                            if ("state".equals(evt.getPropertyName()) && 
+                               SwingWorker.StateValue.DONE == evt.getNewValue()) {
+
+                                try {
+                                    // Set image on EDT thread
+                                    ImageIcon icon = loader.get();
+                                    lbImage.setIcon(icon);
+                                } catch (InterruptedException | ExecutionException ex) {
+                                    System.out.println("Image error");
+                                }
+                            }
+                        });
+                    } catch (Exception ex) {
                         System.out.println("Image error");
                     }
                 }
             }
         });
     }
-    class GifRenderer extends DefaultTableCellRenderer {
-        private ImageIcon gifIcon;
-
-        public GifRenderer() {
-            URL gifUrl = getClass().getResource("/icons/loading.gif"); // Replace "example.gif" with the path to your GIF file
-            gifIcon = new ImageIcon(gifUrl);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value != null && value instanceof Boolean && (boolean) value) {
-                setIcon(gifIcon);
-            } else {
-                setIcon(null);
-            }
-            return this;
-        }
-    }
-    class ImageRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof Icon icon) {
-                setIcon(icon);
-            } else {
-                setText((value == null) ? "" : value.toString());
-            }
-            setHorizontalAlignment(JLabel.CENTER);
-            return this;
-        }
-    }
+//    class ImageRenderer extends DefaultTableCellRenderer {
+//        @Override
+//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//            if (value instanceof Icon icon) {
+//                setIcon(icon);
+//            } else {
+//                setText((value == null) ? "" : value.toString());
+//            }
+//            setHorizontalAlignment(JLabel.CENTER);
+//            return this;
+//        }
+//    }
     
 
 
@@ -381,17 +411,46 @@ public class FormCategory extends javax.swing.JPanel {
     private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtUrlActionPerformed
-
+    private void setFileChooseUI(){
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(this.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
-        // TODO add your handling code here:
+        setFileChooseUI();
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(null); // Open a file chooser dialog
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
+            choosenFile=selectedFile;
+            // Load the selected image and set it in the label
+            ImageIcon imageIcon = new ImageIcon(filePath);
+            Image scaledImage = imageIcon.getImage().getScaledInstance(lbImage.getWidth(), lbImage.getHeight(), Image.SCALE_SMOOTH);
+            
+            lbImage.setIcon(new ImageIcon(scaledImage));
+        } else {
+            JOptionPane.showMessageDialog(this, "Không có file được chọn","Thông báo",2);
+        }
     }//GEN-LAST:event_btnChooseImageActionPerformed
 
     private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
-        // TODO add your handling code here:
+
+        String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
+        if(response.equals("Success")){
+            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
+            refesh();   
+        }
+        else{
+             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Thêm danh mục thất bại!");
+        }
     }//GEN-LAST:event_btnLuuActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        // TODO add your handling code here:
+        refesh();
     }//GEN-LAST:event_btnRefreshActionPerformed
     
     

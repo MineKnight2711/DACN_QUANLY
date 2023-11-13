@@ -6,6 +6,7 @@ package controller;
 
 
 import api.CategoryAPI;
+import java.io.File;
 import java.util.List;
 import model.Category;
 import model.ResponseModel;
@@ -31,5 +32,14 @@ public class CategoryController {
             return jsonHandle.getListCategoryFromJson(responeModel.getData().toString());
         }
         return null;
+    }
+    public String createCategory(String categoryName,File categoryImage){
+        String categoriesResult=categoryAPI.createCategory(categoryName, categoryImage);
+        ResponseModel responeModel=jsonHandle.getResponseFromJson(categoriesResult);
+        String apiResult=responeModel.getMessage();
+        if(apiResult.equals("Success")){
+            return apiResult;
+        }
+        return apiResult;
     }
 }

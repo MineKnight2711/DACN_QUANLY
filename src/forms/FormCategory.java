@@ -50,6 +50,7 @@ public class FormCategory extends javax.swing.JPanel {
         categoryController=new CategoryController();
         createTableLastColumnCellEvent();
         getAllCategory();
+        
     }
     private void createTableLastColumnCellEvent(){
          TableActionEvent event = new TableActionEvent() {
@@ -64,7 +65,11 @@ public class FormCategory extends javax.swing.JPanel {
                     tbCategory.getCellEditor().stopCellEditing();
                 }
                 DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
-                model.removeRow(row);
+                String categoryId = (String) model.getValueAt(row, 0);
+                if(deleteCategory(categoryId)){
+                    model.removeRow(row);
+                }
+//                model.removeRow(row);
             }
 
             @Override
@@ -96,6 +101,18 @@ public class FormCategory extends javax.swing.JPanel {
             categories=categoriesResult;
         }
         loadCategoryTable();   
+    }
+    private boolean deleteCategory(String categoryId){
+        String result=categoryController.deleteCategory(categoryId);
+        if(result.equals("Success")){
+            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Xoá danh mục thành công!");
+            refesh(); 
+            return true;
+        }
+        else{
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+            return false;
+        }
     }
     private void loadCategoryTable() {
         if (!categories.isEmpty()) {

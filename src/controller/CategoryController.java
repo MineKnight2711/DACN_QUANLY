@@ -42,4 +42,13 @@ public class CategoryController {
         }
         return apiResult;
     }
+    public String deleteCategory(String categoryId){
+        String categoriesResult=categoryAPI.deleteCategory(categoryId);
+        ResponseModel responeModel=jsonHandle.getResponseFromJson(categoriesResult);
+        String apiResult=responeModel.getMessage();
+        if(apiResult.equals("Success")){
+            return apiResult;
+        }
+        return apiResult;
+    }
 }

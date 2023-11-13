@@ -98,4 +98,24 @@ public class CategoryAPI {
         }
         return response.toString();
     }
+    public String deleteCategory(String categoryId){
+        StringBuilder response = new StringBuilder();
+        try {
+            URL url = new URL(BaseURL.BASE_URL+"category"+"/"+categoryId);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("DELETE");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            connection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+        }
+        return response.toString();
+    }
 }

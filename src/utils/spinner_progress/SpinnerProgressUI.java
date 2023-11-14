@@ -3,20 +3,15 @@ import com.formdev.flatlaf.ui.FlatProgressBarUI;
 import com.formdev.flatlaf.util.Animator;
 import com.formdev.flatlaf.util.UIScale;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.Insets;;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
 import javax.swing.JComponent;
-import spinner_progress.render.RingSpinner;
-import spinner_progress.render.SpinnerRender;
-import com.formdev.flatlaf.util.SwingUtils;
+
 //import sun.swing.SwingUtilities2;
 
 /**

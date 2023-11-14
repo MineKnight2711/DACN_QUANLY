@@ -9,7 +9,6 @@ import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
-import spinner_progress.SpinnerUtils;
 
 
 /**

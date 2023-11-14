@@ -30,7 +30,6 @@ import javax.swing.table.TableRowSorter;
 import model.Category;
 import raven.toast.Notifications;
 import utils.ImageLoader;
-import utils.JsonHandle;
 import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
 import utils.table.TableActionCellRender;
@@ -66,9 +65,10 @@ public class FormCategory extends javax.swing.JPanel {
                 }
                 DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
                 String categoryId = (String) model.getValueAt(row, 0);
-                if(deleteCategory(categoryId)){
-                    model.removeRow(row);
-                }
+                deleteCategory(categoryId);
+//                if(deleteCategory(categoryId)){
+//                    model.removeRow(row);
+//                }
 //                model.removeRow(row);
             }
 
@@ -99,8 +99,11 @@ public class FormCategory extends javax.swing.JPanel {
         List<Category> categoriesResult=categoryController.getAllCategory();
         if(categoriesResult!=null){
             categories=categoriesResult;
+            loadCategoryTable();
         }
-        loadCategoryTable();   
+        else
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có danh mục!");
+           
     }
     private boolean deleteCategory(String categoryId){
         String result=categoryController.deleteCategory(categoryId);

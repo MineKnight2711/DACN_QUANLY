@@ -28,7 +28,7 @@ public class Menu extends JPanel {
         {"~MAIN~"},
         {"Dashboard"},
         {"~WEB APP~"},
-        {"QUẢN LÝ", "Nhân viên", "Danh Mục", "Đơn Hàng", "Voucher"},
+        {"QUẢN LÝ", "Nhân viên", "Danh Mục","Món ăn", "Đơn Hàng", "Voucher"},
         {"Chat"},
         {"Calendar"},
         {"~COMPONENT~"},

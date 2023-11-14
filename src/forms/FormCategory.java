@@ -29,8 +29,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import model.Category;
 import raven.toast.Notifications;
+import utils.ImageCellRender;
 import utils.ImageLoader;
-import utils.JsonHandle;
 import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
 import utils.table.TableActionCellRender;
@@ -43,7 +43,7 @@ import utils.table.TableActionEvent;
  */
 public class FormCategory extends javax.swing.JPanel {
     private File choosenFile;
-    private CategoryController categoryController;
+    private final CategoryController categoryController;
     private List<Category> categories;
     public FormCategory() {
         initComponents();
@@ -66,9 +66,10 @@ public class FormCategory extends javax.swing.JPanel {
                 }
                 DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
                 String categoryId = (String) model.getValueAt(row, 0);
-                if(deleteCategory(categoryId)){
-                    model.removeRow(row);
-                }
+                deleteCategory(categoryId);
+//                if(deleteCategory(categoryId)){
+//                    model.removeRow(row);
+//                }
 //                model.removeRow(row);
             }
 
@@ -99,8 +100,10 @@ public class FormCategory extends javax.swing.JPanel {
         List<Category> categoriesResult=categoryController.getAllCategory();
         if(categoriesResult!=null){
             categories=categoriesResult;
+            loadCategoryTable();   
         }
-        loadCategoryTable();   
+        else
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có danh mục!");
     }
     private boolean deleteCategory(String categoryId){
         String result=categoryController.deleteCategory(categoryId);
@@ -137,10 +140,6 @@ public class FormCategory extends javax.swing.JPanel {
                 for (int i = 0; i < totalCategories; i++) {
                     Category cate = categories.get(i);
                     String imageUrl = cate.getImageUrl();
-//                    progress++;
-//                    int progressPercent = (progress * 100) / totalCategories;
-//                    progressBar.setValue(progressPercent);
-                    // Use a separate final variable
                     final int currentIndex = i;
                     
                     ImageLoader imageLoader = new ImageLoader(imageUrl, 150, 150);
@@ -164,7 +163,7 @@ public class FormCategory extends javax.swing.JPanel {
                                     if (currentCount == totalCategories) {
                                         // All images are loaded, do additional UI setup here
                                         TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
-                                        imageColumn.setCellRenderer(new ImageRenderer());
+                                        imageColumn.setCellRenderer(new ImageCellRender());
                                         tbCategory.setRowSorter(new TableRowSorter<>(model));
                                         tbCategory.setRowHeight(150);
                                         tbCategory.revalidate();
@@ -182,88 +181,13 @@ public class FormCategory extends javax.swing.JPanel {
                     imageLoader.execute();
                 }
                 TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
-                imageColumn.setCellRenderer(new ImageRenderer());
+                imageColumn.setCellRenderer(new ImageCellRender());
                 tbCategory.setRowHeight(50);
         } else {
             JOptionPane.showMessageDialog(this, "Không có danh mục nào!", "Lỗi", 0);
         }
     }
-//    private void loadCategoryTable() {
-//        if (!categories.isEmpty()) {
-//            
-//            DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
-//            model.setRowCount(0);
-//            int numberOfCategories = categories.size();
-//        AtomicInteger count = new AtomicInteger(0);
-//            for (Category cate : categories) {
-//                String userID = cate.getCategoryID();
-//                String imageID = cate.getCategoryName();
-//                String imageUrl = cate.getImageUrl();
-//                TableColumn spinnerColumn = tbCategory.getColumnModel().getColumn(2);
-//                spinnerColumn.setCellRenderer(new ImageRenderer());
-//                // Create an instance of ImageLoader to load the image asynchronously
-//                ImageLoader imageLoader = new ImageLoader(imageUrl, 100, 100);
-//
-//                imageLoader.addPropertyChangeListener(evt -> {
-//                if ("state".equals(evt.getPropertyName()) && SwingWorker.StateValue.DONE == evt.getNewValue()) {
-//                    try {
-//                        ImageIcon scaledImageIcon = imageLoader.get();
-//                        
-//                        // Update the UI on the EDT
-//                        SwingUtilities.invokeLater(() -> {
-//                            model.addRow(new Object[]{userID, imageID, scaledImageIcon});
-//                            tbCategory.revalidate();
-//
-//                            int currentCount = count.incrementAndGet();
-//                            if (currentCount == numberOfCategories) {
-//                                // All images are loaded, do additional UI setup here
-//                                TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
-//                                imageColumn.setCellRenderer(new ImageRenderer());
-//                                tbCategory.setRowSorter(new TableRowSorter<>(model));
-//                                tbCategory.setRowHeight(100);
-//                                createTableRowClick();
-//                            }
-//                        });
-//
-//                    } catch (InterruptedException | ExecutionException e) {
-//                        System.out.println("Error when loading image: " + e.getMessage());
-//                    }
-//                }
-//            });
-//
-//            imageLoader.execute();
-//            }
-//
-//
-////            TableColumn imageColumn = tbCategory.getColumnModel().getColumn(2);
-////            imageColumn.setCellRenderer(new ImageRenderer());
-////            tbCategory.setRowSorter(new TableRowSorter(model));
-////            tbCategory.setRowHeight(100);
-////            createTableRowClick();
-//        } else {
-//            JOptionPane.showMessageDialog(this, "Không có danh mục nào!", "Lỗi", 0);
-//        }
-//        
-//    }
-    class ImageRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof Icon icon) {
-                setIcon(icon);
-                setText(null); // Clear text
-            } else if (value instanceof SpinnerProgress progressBar) { 
-                progressBar.setStringPainted(true); 
-                progressBar.setPreferredSize(new Dimension(50,50));
-                return progressBar;
-            } else {
-                setIcon(null); // Clear icon
-                setText((value == null) ? "" : value.toString());
-            }
 
-            setHorizontalAlignment(JLabel.CENTER);
-            return this;
-        }
-    }
 
     
     private void createTableRowClick(){

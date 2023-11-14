@@ -20,6 +20,7 @@ import application.Application;
 import forms.FormDashboard;
 import forms.FormQuanLyNhanVien;
 import forms.FormCategory;
+import forms.FormDish;
 import menu.Menu;
 import menu.MenuAction;
 
@@ -75,7 +76,10 @@ public class MainForm extends JLayeredPane {
                     Application.showForm(new FormQuanLyNhanVien());
                 } else if (subIndex == 2) {
                     Application.showForm(new FormCategory());
-                } else {
+                } else if(subIndex==3){
+                     Application.showForm(new FormDish());
+                }
+                else {
                     action.cancel();
                 }
             } else if (index == 9) {

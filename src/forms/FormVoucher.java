@@ -48,17 +48,20 @@ import utils.table.TableActionEvent;
  *
  * @author Raven
  */
-public class FormCategory extends javax.swing.JPanel {
+public class FormVoucher extends javax.swing.JPanel {
     private File choosenFile;
     private final CategoryController categoryController;
     private List<Category> categories;
     private JPopupMenu menu;
     private PanelSearch search;
-    public FormCategory() {
+    public FormVoucher() {
         initComponents();
+      
         categoryController=new CategoryController();
         createTableLastColumnCellEvent();
         getAllCategory();
+        
+        
         menu = new JPopupMenu();
         search = new PanelSearch();
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
@@ -122,8 +125,8 @@ public class FormCategory extends javax.swing.JPanel {
         });
     }
     private void refesh(){
-        txtCategoryName.setText("");
-        txtUrl.setText("");
+        txtIDVoucher.setText("");
+      
         lbImage.setIcon(null);
         choosenFile=null;
         categories=null;
@@ -292,8 +295,8 @@ public class FormCategory extends javax.swing.JPanel {
                 if (selectedRow >= 0) {
                     try {
                         Category selectedCategory = categories.get(selectedRow);
-                        txtCategoryName.setText(selectedCategory.getCategoryName());
-                        txtUrl.setText(selectedCategory.getImageUrl());
+                        txtIDVoucher.setText(selectedCategory.getCategoryName());
+                       
 
                         ImageLoader loader = new ImageLoader(selectedCategory.getImageUrl(), lbImage.getWidth(), lbImage.getHeight());
                         loader.execute();
@@ -337,11 +340,12 @@ public class FormCategory extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        dateStart = new com.raven.datechooser.DateChooser();
+        dateExpired = new com.raven.datechooser.DateChooser();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbCategory = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        txtCategoryName = new javax.swing.JTextField();
-        txtUrl = new javax.swing.JTextField();
+        txtIDVoucher = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         pnImage = new javax.swing.JPanel();
         lbImage = new javax.swing.JLabel();
@@ -354,24 +358,38 @@ public class FormCategory extends javax.swing.JPanel {
         btnLuu = new button.Button();
         btnChooseImage = new button.Button();
         btnRefesh = new button.Button();
-        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        txtCategoryName1 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txtDate1 = new javax.swing.JTextField();
+        btnChooseStart = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        txtDateExpired = new javax.swing.JTextField();
+        btnChooseExpired = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        txtIDVoucher1 = new javax.swing.JTextField();
+
+        dateStart.setForeground(new java.awt.Color(255, 102, 51));
+        dateStart.setTextField(txtDate1);
+
+        dateExpired.setTextField(txtDateExpired);
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tbCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Mã danh mục", "Tên danh mục", "Hình", "Thao tác"
+                "Mã voucher", "Tên voucher", "Ngày bắt đầu sử dụng", "Ngày hết hạn", "Giảm giá", "Ảnh voucher"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, true
+                false, false, false, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -382,24 +400,16 @@ public class FormCategory extends javax.swing.JPanel {
         tbCategory.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(tbCategory);
 
-        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 1080, 440));
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 1080, 400));
 
-        jLabel1.setText("Tên danh mục");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
+        jLabel1.setText("Mã voucher:");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, -1));
 
-        txtCategoryName.setEditable(false);
-        add(txtCategoryName, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, 355, 34));
+        txtIDVoucher.setEditable(false);
+        add(txtIDVoucher, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 90, 360, 30));
 
-        txtUrl.setEditable(false);
-        txtUrl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUrlActionPerformed(evt);
-            }
-        });
-        add(txtUrl, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, 355, 34));
-
-        jLabel2.setText("Ảnh danh mục:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 90, -1, -1));
+        jLabel2.setText("Ảnh voucher:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 90, -1, -1));
 
         pnImage.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
@@ -408,11 +418,11 @@ public class FormCategory extends javax.swing.JPanel {
         lbImage.setPreferredSize(new java.awt.Dimension(250, 250));
         pnImage.add(lbImage);
 
-        add(pnImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 80, 210, 190));
+        add(pnImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 90, 220, 200));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel3.setText("Chào mừng chủ nhân đến với quản lý danh mục...");
+        jLabel3.setText("Chào mừng chủ nhân đến với chuyên mục quản lý voucher...");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 340, 30));
 
         jLabel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(225, 225, 225)));
@@ -423,7 +433,7 @@ public class FormCategory extends javax.swing.JPanel {
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel9.setText("QUẢN LÝ DANH MỤC");
+        jLabel9.setText("QUẢN LÝ VOUCHER");
         add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 6, 230, 30));
 
         lbExit1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -493,13 +503,42 @@ public class FormCategory extends javax.swing.JPanel {
         });
         add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 210, 140, -1));
 
-        jLabel5.setText("Đường dẫn");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
-    }// </editor-fold>//GEN-END:initComponents
+        jLabel6.setText("Ngày bắt đầu sử dụng:");
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
 
-    private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtUrlActionPerformed
+        txtCategoryName1.setEditable(false);
+        add(txtCategoryName1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 360, 30));
+
+        jLabel7.setText("Giảm giá:");
+        add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 300, -1, -1));
+        add(txtDate1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 310, 30));
+
+        btnChooseStart.setText("...");
+        btnChooseStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseStartActionPerformed(evt);
+            }
+        });
+        add(btnChooseStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 190, 40, 30));
+
+        jLabel10.setText("Ngày hết hạn:");
+        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, -1, -1));
+        add(txtDateExpired, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 310, 30));
+
+        btnChooseExpired.setText("...");
+        btnChooseExpired.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseExpiredActionPerformed(evt);
+            }
+        });
+        add(btnChooseExpired, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 240, 40, 30));
+
+        jLabel11.setText("Tên voucher:");
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
+
+        txtIDVoucher1.setEditable(false);
+        add(txtIDVoucher1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 360, 30));
+    }// </editor-fold>//GEN-END:initComponents
     private void setFileChooseUI(){
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -534,7 +573,7 @@ public class FormCategory extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSearchKeyReleased
 
     private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
-        String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
+        String response = categoryController.createCategory(txtIDVoucher.getText(),choosenFile);
         if(response.equals("Success")){
             Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
             refesh();   
@@ -566,17 +605,33 @@ public class FormCategory extends javax.swing.JPanel {
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
+
+    private void btnChooseStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseStartActionPerformed
+       dateStart.showPopup();
+    }//GEN-LAST:event_btnChooseStartActionPerformed
+
+    private void btnChooseExpiredActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseExpiredActionPerformed
+      dateExpired.showPopup();
+    }//GEN-LAST:event_btnChooseExpiredActionPerformed
     
-    
+     
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChooseExpired;
     private button.Button btnChooseImage;
+    private javax.swing.JButton btnChooseStart;
     private button.Button btnLuu;
     private button.Button btnRefesh;
+    private com.raven.datechooser.DateChooser dateExpired;
+    private com.raven.datechooser.DateChooser dateStart;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;
@@ -584,8 +639,11 @@ public class FormCategory extends javax.swing.JPanel {
     private javax.swing.JLabel lbImage;
     private javax.swing.JPanel pnImage;
     private javax.swing.JTable tbCategory;
-    private javax.swing.JTextField txtCategoryName;
+    private javax.swing.JTextField txtCategoryName1;
+    private javax.swing.JTextField txtDate1;
+    private javax.swing.JTextField txtDateExpired;
+    private javax.swing.JTextField txtIDVoucher;
+    private javax.swing.JTextField txtIDVoucher1;
     private swing.MyTextField txtSearch;
-    private javax.swing.JTextField txtUrl;
     // End of variables declaration//GEN-END:variables
 }

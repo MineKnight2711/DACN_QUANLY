@@ -20,6 +20,9 @@ import application.Application;
 import forms.FormDashboard;
 import forms.FormQuanLyNhanVien;
 import forms.FormCategory;
+import forms.FormDish;
+import forms.FormQLDonHang;
+import forms.FormVoucher;
 import menu.Menu;
 import menu.MenuAction;
 
@@ -62,7 +65,7 @@ public class MainForm extends JLayeredPane {
             menuButton = new JButton();
         }
         String icon = (getComponentOrientation().isLeftToRight()) ? "menu_left.svg" : "menu_right.svg";
-        menuButton.setIcon(new FlatSVGIcon("src\\icons\\svg" + icon, 0.8f));
+        menuButton.setIcon(new FlatSVGIcon("icons/svg/" + icon, 0.8f));
     }
 
     private void initMenuEvent() {
@@ -75,7 +78,17 @@ public class MainForm extends JLayeredPane {
                     Application.showForm(new FormQuanLyNhanVien());
                 } else if (subIndex == 2) {
                     Application.showForm(new FormCategory());
-                } else {
+                } else if(subIndex==3){
+                     Application.showForm(new FormDish());
+                }
+                else if(subIndex==4){
+                     Application.showForm(new FormQLDonHang());
+                }
+                else if(subIndex==5){
+                     Application.showForm(new FormVoucher());
+                }
+                
+                else {
                     action.cancel();
                 }
             } else if (index == 9) {
@@ -93,7 +106,7 @@ public class MainForm extends JLayeredPane {
         } else {
             icon = (full) ? "menu_right.svg" : "menu_left.svg";
         }
-        menuButton.setIcon(new FlatSVGIcon("raven/icon/svg/" + icon, 0.8f));
+        menuButton.setIcon(new FlatSVGIcon("icons/svg/" + icon, 0.8f));
         menu.setMenuFull(full);
         revalidate();
     }

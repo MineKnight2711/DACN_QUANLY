@@ -5,11 +5,10 @@
 package utils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import java.util.List;
 import model.Category;
+import model.Dish;
 import model.LoginResponse;
 import model.ResponseModel;
 
@@ -18,7 +17,7 @@ import model.ResponseModel;
  * @author WitherDragon
  */
 public class JsonHandle {
-    private Gson gson;
+    private final Gson gson;
     public JsonHandle() {
         gson=new Gson();
     }
@@ -33,4 +32,9 @@ public class JsonHandle {
     public List<Category> getListCategoryFromJson(String listJson){
         return gson.fromJson(listJson, new TypeToken<List<Category>>() {}.getType());
     }
+
+    public List<Dish> getDishesFromResponseModel(String listJson) {
+        return gson.fromJson(listJson, new TypeToken<List<Dish>>() {}.getType());
+    }
+    
 }

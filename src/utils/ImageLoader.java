@@ -4,20 +4,19 @@
  */
 package utils;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
+
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 
 import javax.swing.ImageIcon;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -49,34 +48,24 @@ private int progress;
         protected ImageIcon doInBackground() {
 
           try {
-            URL url = new URL(imageUrl);
-            InputStream in = url.openStream();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+              
+           URL url = new URL(imageUrl);
+            ImageInputStream iis = ImageIO.createImageInputStream(url.openStream());
+            BufferedImage img = ImageIO.read(iis);
 
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) > 0) {
-              baos.write(buffer, 0, read);
-              process(null); 
-            }
+            int newWidth = width; // Your desired width
+            int newHeight = height; // Your desired height
 
-            byte[] imageData = baos.toByteArray();
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
-            // Scale image first 
-            Image scaled = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            // Create a new BufferedImage for the scaled image
+            BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 
-            // Draw scaled image onto new BufferedImage
-            BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = result.createGraphics();
+            // Perform the scaling using AffineTransformOp with bicubic interpolation
+            AffineTransform at = AffineTransform.getScaleInstance((double)newWidth / img.getWidth(),
+                                                                 (double)newHeight / img.getHeight());
+            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+            scaledImage = scaleOp.filter(img, scaledImage);
 
-            // Render mode
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
-                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-            // Draw scaled image 
-            g2.drawImage(scaled, 0, 0, null); 
-            g2.dispose();
-            return new ImageIcon(scaled);
+            return new ImageIcon(scaledImage );
 
           } catch (IOException e) {
             e.printStackTrace();

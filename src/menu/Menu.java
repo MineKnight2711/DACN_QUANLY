@@ -28,16 +28,11 @@ public class Menu extends JPanel {
         {"~MAIN~"},
         {"Dashboard"},
         {"~WEB APP~"},
-        {"QUẢN LÝ", "Nhân viên", "Danh Mục", "Đơn Hàng", "Voucher"},
-        {"Chat"},
-        {"Calendar"},
-        {"~COMPONENT~"},
-        {"Advanced UI", "Cropper", "Owl Carousel", "Sweet Alert"},
-        {"Forms", "Basic Elements", "Advanced Elements", "Editors", "Wizard"},
+        {"QUẢN LÝ", "Nhân viên", "Danh mục","Món ăn", "Đơn hàng", "Voucher"},
+        {"Chats"},
         {"~OTHER~"},
-        {"Charts", "Apex", "Flot", "Peity", "Sparkline"},
-        {"Icons", "Feather Icons", "Flag Icons", "Mdi Icons"},
-        {"Special Pages", "Blank page", "Faq", "Invoice", "Profile", "Pricing", "Timeline"},
+        {"THỐNG KÊ", "Doanh thu", "Đơn hàng"},
+     
         {"Logout"}
     };
 
@@ -65,7 +60,7 @@ public class Menu extends JPanel {
 
     private final List<MenuEvent> events = new ArrayList<>();
     private boolean menuFull = true;
-    private final String headerName = "Raven Channel";
+    private final String headerName = "       DatFood Manager";
 
     protected final boolean hideMenuTitleOnMinimum = true;
     protected final int menuTitleLeftInset = 5;
@@ -85,7 +80,7 @@ public class Menu extends JPanel {
                 + "background:$Menu.background;"
                 + "arc:10");
         header = new JLabel(headerName);
-        header.setIcon(new ImageIcon(getClass().getResource("/icons/logo.png")));
+       
         header.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$Menu.header.font;"
                 + "foreground:$Menu.foreground");

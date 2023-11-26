@@ -24,7 +24,10 @@ public class Category {
     public String getCategoryName() {
         return categoryName;
     }
-
+    @Override
+    public String toString() {
+      return categoryName;
+    }
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
@@ -32,7 +35,7 @@ public class Category {
     public String getImageUrl() {
         return imageUrl;
     }
-
+    
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }

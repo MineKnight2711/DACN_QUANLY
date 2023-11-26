@@ -166,7 +166,7 @@ public class LoginForm extends javax.swing.JPanel {
         add(pnBannel, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 140, -1, 440));
 
         lbExit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lbExit.setForeground(new java.awt.Color(102, 102, 102));
+        lbExit.setForeground(new java.awt.Color(255, 0, 0));
         lbExit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbExit.setText("X");
         lbExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));

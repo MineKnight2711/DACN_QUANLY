@@ -48,17 +48,20 @@ import utils.table.TableActionEvent;
  *
  * @author Raven
  */
-public class FormCategory extends javax.swing.JPanel {
+public class FormQLDonHang extends javax.swing.JPanel {
     private File choosenFile;
     private final CategoryController categoryController;
     private List<Category> categories;
     private JPopupMenu menu;
     private PanelSearch search;
-    public FormCategory() {
+    public FormQLDonHang() {
         initComponents();
+      
         categoryController=new CategoryController();
         createTableLastColumnCellEvent();
         getAllCategory();
+        
+        
         menu = new JPopupMenu();
         search = new PanelSearch();
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
@@ -122,9 +125,9 @@ public class FormCategory extends javax.swing.JPanel {
         });
     }
     private void refesh(){
-        txtCategoryName.setText("");
-        txtUrl.setText("");
-        lbImage.setIcon(null);
+        txtIDVoucher.setText("");
+      
+       
         choosenFile=null;
         categories=null;
         getAllCategory();
@@ -292,25 +295,11 @@ public class FormCategory extends javax.swing.JPanel {
                 if (selectedRow >= 0) {
                     try {
                         Category selectedCategory = categories.get(selectedRow);
-                        txtCategoryName.setText(selectedCategory.getCategoryName());
-                        txtUrl.setText(selectedCategory.getImageUrl());
+                        txtIDVoucher.setText(selectedCategory.getCategoryName());
+                       
 
-                        ImageLoader loader = new ImageLoader(selectedCategory.getImageUrl(), lbImage.getWidth(), lbImage.getHeight());
-                        loader.execute();
-
-                        loader.addPropertyChangeListener(evt -> {
-                            if ("state".equals(evt.getPropertyName()) && 
-                               SwingWorker.StateValue.DONE == evt.getNewValue()) {
-
-                                try {
-                                    // Set image on EDT thread
-                                    ImageIcon icon = loader.get();
-                                    lbImage.setIcon(icon);
-                                } catch (InterruptedException | ExecutionException ex) {
-                                    System.out.println("Image error");
-                                }
-                            }
-                        });
+           
+                       
                     } catch (Exception ex) {
                         System.out.println("Image error");
                     }
@@ -337,41 +326,55 @@ public class FormCategory extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        dateStart = new com.raven.datechooser.DateChooser();
+        dateExpired = new com.raven.datechooser.DateChooser();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbCategory = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        txtCategoryName = new javax.swing.JTextField();
-        txtUrl = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        pnImage = new javax.swing.JPanel();
-        lbImage = new javax.swing.JLabel();
+        txtIDVoucher = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         txtSearch = new swing.MyTextField();
-        btnLuu = new utils.Button();
-        btnChooseImage = new utils.Button();
+        btnXemChiTiet = new utils.Button();
         btnRefesh = new utils.Button();
+        jLabel6 = new javax.swing.JLabel();
+        txtPaymentMethod = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        txtOrderDate = new javax.swing.JTextField();
+        btnChooseExpired = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        txtIDVoucher1 = new javax.swing.JTextField();
+        btnPrint = new utils.Button();
+        txtIDVoucher2 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtVoucher = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
+        txtStatus = new javax.swing.JTextField();
+
+        dateStart.setForeground(new java.awt.Color(255, 102, 51));
+
+        dateExpired.setTextField(txtOrderDate);
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tbCategory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Mã danh mục", "Tên danh mục", "Hình", "Thao tác"
+                "Mã đơn hàng", "Mã khách hàng", "Tên khách hàng", "Ngày đặt hàng", "Phương thức thanh toán", "Mã voucher", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, true
+                false, true, false, false, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -384,35 +387,15 @@ public class FormCategory extends javax.swing.JPanel {
 
         add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 1080, 440));
 
-        jLabel1.setText("Tên danh mục");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
+        jLabel1.setText("Mã đơn hàng:");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, -1));
 
-        txtCategoryName.setEditable(false);
-        add(txtCategoryName, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, 355, 34));
-
-        txtUrl.setEditable(false);
-        txtUrl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUrlActionPerformed(evt);
-            }
-        });
-        add(txtUrl, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, 355, 34));
-
-        jLabel2.setText("Ảnh danh mục:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 90, -1, -1));
-
-        pnImage.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-
-        lbImage.setForeground(new java.awt.Color(255, 255, 255));
-        lbImage.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        lbImage.setPreferredSize(new java.awt.Dimension(250, 250));
-        pnImage.add(lbImage);
-
-        add(pnImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 80, 210, 190));
+        txtIDVoucher.setEditable(false);
+        add(txtIDVoucher, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 90, 360, 30));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel3.setText("Chào mừng chủ nhân đến với quản lý danh mục...");
+        jLabel3.setText("Chào mừng chủ nhân đến với chuyên mục quản lý đơn hàng...");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 340, 30));
 
         jLabel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(225, 225, 225)));
@@ -423,7 +406,7 @@ public class FormCategory extends javax.swing.JPanel {
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel9.setText("QUẢN LÝ DANH MỤC");
+        jLabel9.setText("QUẢN LÝ ĐƠN HÀNG");
         add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 6, 230, 30));
 
         lbExit1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -457,29 +440,17 @@ public class FormCategory extends javax.swing.JPanel {
         });
         add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 420, 30));
 
-        btnLuu.setBackground(new java.awt.Color(30, 180, 114));
-        btnLuu.setForeground(new java.awt.Color(245, 245, 245));
-        btnLuu.setText("Lưu");
-        btnLuu.setRippleColor(new java.awt.Color(255, 255, 255));
-        btnLuu.setShadowColor(new java.awt.Color(30, 180, 114));
-        btnLuu.addActionListener(new java.awt.event.ActionListener() {
+        btnXemChiTiet.setBackground(new java.awt.Color(30, 180, 114));
+        btnXemChiTiet.setForeground(new java.awt.Color(245, 245, 245));
+        btnXemChiTiet.setText("Xem chi tiết đơn hàng");
+        btnXemChiTiet.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnXemChiTiet.setShadowColor(new java.awt.Color(30, 180, 114));
+        btnXemChiTiet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLuuActionPerformed(evt);
+                btnXemChiTietActionPerformed(evt);
             }
         });
-        add(btnLuu, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 90, 140, -1));
-
-        btnChooseImage.setBackground(new java.awt.Color(253, 83, 83));
-        btnChooseImage.setForeground(new java.awt.Color(245, 245, 245));
-        btnChooseImage.setText("Chọn ảnh");
-        btnChooseImage.setRippleColor(new java.awt.Color(255, 255, 255));
-        btnChooseImage.setShadowColor(new java.awt.Color(253, 83, 83));
-        btnChooseImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChooseImageActionPerformed(evt);
-            }
-        });
-        add(btnChooseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 150, 140, -1));
+        add(btnXemChiTiet, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 240, 150, 45));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -491,15 +462,55 @@ public class FormCategory extends javax.swing.JPanel {
                 btnRefeshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 210, 140, -1));
+        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 240, 150, 45));
 
-        jLabel5.setText("Đường dẫn");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
+        jLabel6.setText("Tên khách hàng:");
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
+
+        txtPaymentMethod.setEditable(false);
+        add(txtPaymentMethod, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 90, 316, 30));
+
+        jLabel7.setText("P. Thức thanh toán:");
+        add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 100, -1, -1));
+
+        jLabel10.setText("Ngày đặt hàng:");
+        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, -1, -1));
+        add(txtOrderDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 310, 30));
+
+        btnChooseExpired.setText("...");
+        btnChooseExpired.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseExpiredActionPerformed(evt);
+            }
+        });
+        add(btnChooseExpired, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 240, 40, 30));
+
+        jLabel11.setText("Mã khách hàng:");
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
+
+        txtIDVoucher1.setEditable(false);
+        add(txtIDVoucher1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 360, 30));
+
+        btnPrint.setBackground(new java.awt.Color(255, 102, 51));
+        btnPrint.setForeground(new java.awt.Color(255, 255, 255));
+        btnPrint.setText("Print");
+        add(btnPrint, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 240, 150, 45));
+
+        txtIDVoucher2.setEditable(false);
+        add(txtIDVoucher2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 360, 30));
+
+        jLabel2.setText("Áp mã voucher:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 150, -1, -1));
+
+        txtVoucher.setEditable(false);
+        add(txtVoucher, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 140, 316, 30));
+
+        jLabel5.setText("Status:");
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 200, -1, -1));
+
+        txtStatus.setEditable(false);
+        add(txtStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 190, 316, 30));
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtUrlActionPerformed
     private void setFileChooseUI(){
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -533,8 +544,8 @@ public class FormCategory extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtSearchKeyReleased
 
-    private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
-        String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
+    private void btnXemChiTietActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXemChiTietActionPerformed
+        String response = categoryController.createCategory(txtIDVoucher.getText(),choosenFile);
         if(response.equals("Success")){
             Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
             refesh();   
@@ -542,50 +553,46 @@ public class FormCategory extends javax.swing.JPanel {
         else{
              Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Thêm danh mục thất bại!");
         }
-    }//GEN-LAST:event_btnLuuActionPerformed
-
-    private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
-          setFileChooseUI();
-        JFileChooser fileChooser = new JFileChooser();
-        int returnValue = fileChooser.showOpenDialog(null); // Open a file chooser dialog
-
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            String filePath = selectedFile.getAbsolutePath();
-            choosenFile=selectedFile;
-            // Load the selected image and set it in the label
-            ImageIcon imageIcon = new ImageIcon(filePath);
-            Image scaledImage = imageIcon.getImage().getScaledInstance(lbImage.getWidth(), lbImage.getHeight(), Image.SCALE_SMOOTH);
-            
-            lbImage.setIcon(new ImageIcon(scaledImage));
-        } else {
-            JOptionPane.showMessageDialog(this, "Không có file được chọn","Thông báo",2);
-        }
-    }//GEN-LAST:event_btnChooseImageActionPerformed
+    }//GEN-LAST:event_btnXemChiTietActionPerformed
 
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
+
+    private void btnChooseExpiredActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseExpiredActionPerformed
+      dateExpired.showPopup();
+    }//GEN-LAST:event_btnChooseExpiredActionPerformed
     
-    
+     
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private utils.Button btnChooseImage;
-    private utils.Button btnLuu;
+    private javax.swing.JButton btnChooseExpired;
+    private utils.Button btnPrint;
     private utils.Button btnRefesh;
+    private utils.Button btnXemChiTiet;
+    private com.raven.datechooser.DateChooser dateExpired;
+    private com.raven.datechooser.DateChooser dateStart;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbExit1;
-    private javax.swing.JLabel lbImage;
-    private javax.swing.JPanel pnImage;
     private javax.swing.JTable tbCategory;
-    private javax.swing.JTextField txtCategoryName;
+    private javax.swing.JTextField txtIDVoucher;
+    private javax.swing.JTextField txtIDVoucher1;
+    private javax.swing.JTextField txtIDVoucher2;
+    private javax.swing.JTextField txtOrderDate;
+    private javax.swing.JTextField txtPaymentMethod;
     private swing.MyTextField txtSearch;
-    private javax.swing.JTextField txtUrl;
+    private javax.swing.JTextField txtStatus;
+    private javax.swing.JTextField txtVoucher;
     // End of variables declaration//GEN-END:variables
 }

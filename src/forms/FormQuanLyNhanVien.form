@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.ButtonGroup" name="btgGender">
+    </Component>
+    <Component class="javax.swing.ButtonGroup" name="btgRole">
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[1366, 768]"/>
@@ -283,7 +289,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="button.Button" name="btnLuu">
+    <Component class="utils.Button" name="btnLuu">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="72" green="b4" red="1e" type="rgb"/>
@@ -308,7 +314,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="button.Button" name="btnChooseImage">
+    <Component class="utils.Button" name="btnChooseImage">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="53" green="53" red="fd" type="rgb"/>
@@ -333,7 +339,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="button.Button" name="btnRefesh">
+    <Component class="utils.Button" name="btnRefesh">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="fd" green="a2" red="1d" type="rgb"/>
@@ -408,7 +414,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="radioNu">
+    <Component class="javax.swing.JRadioButton" name="rbNu">
       <Properties>
         <Property name="text" type="java.lang.String" value="N&#x1eef;"/>
       </Properties>
@@ -418,7 +424,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="radioNam">
+    <Component class="javax.swing.JRadioButton" name="rbNam">
       <Properties>
         <Property name="text" type="java.lang.String" value="Nam"/>
       </Properties>
@@ -468,7 +474,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="radioDeliver">
+    <Component class="javax.swing.JRadioButton" name="rbDeliver">
       <Properties>
         <Property name="text" type="java.lang.String" value="Deliver"/>
       </Properties>
@@ -478,7 +484,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="javax.swing.JRadioButton" name="radioAdmin">
+    <Component class="javax.swing.JRadioButton" name="rbAdmin">
       <Properties>
         <Property name="text" type="java.lang.String" value="Admin"/>
       </Properties>

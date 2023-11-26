@@ -351,9 +351,9 @@ public class FormCategory extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         txtSearch = new swing.MyTextField();
-        btnLuu = new button.Button();
-        btnChooseImage = new button.Button();
-        btnRefesh = new button.Button();
+        btnLuu = new utils.Button();
+        btnChooseImage = new utils.Button();
+        btnRefesh = new utils.Button();
         jLabel5 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
@@ -569,9 +569,9 @@ public class FormCategory extends javax.swing.JPanel {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private button.Button btnChooseImage;
-    private button.Button btnLuu;
-    private button.Button btnRefesh;
+    private utils.Button btnChooseImage;
+    private utils.Button btnLuu;
+    private utils.Button btnRefesh;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

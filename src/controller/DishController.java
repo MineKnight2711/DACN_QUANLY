@@ -8,8 +8,6 @@ import api.DishAPI;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Dish;
 import model.ResponseModel;
 import utils.JsonHandle;
@@ -51,6 +49,21 @@ public class DishController {
     public String deleteDish(String dishId){
         try {
             String apiResult=dishAPI.deleteDish(dishId);
+            ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
+            if(responseModel.getMessage().equals("Success")){
+                return responseModel.getMessage();
+            }
+            return responseModel.getMessage();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "Unknown";
+        }
+    }
+
+    public String updateDish(File image,Dish dish) 
+    {
+        try {
+            String apiResult=dishAPI.updateNewDish(image, dish);
             ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
             if(responseModel.getMessage().equals("Success")){
                 return responseModel.getMessage();

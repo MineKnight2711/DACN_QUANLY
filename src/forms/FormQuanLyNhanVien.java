@@ -53,10 +53,11 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     private PanelSearch search;
     public FormQuanLyNhanVien() {
         initComponents();
-         menu = new JPopupMenu();
+        menu = new JPopupMenu();
         search = new PanelSearch();
-          categoryController=new CategoryController();
+        categoryController=new CategoryController();
         createTableLastColumnCellEvent();
+        initButtonGroup();
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
         menu.add(search);
         menu.setFocusable(false);
@@ -81,7 +82,13 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
             }
         });
     }
-
+    private void initButtonGroup()
+    {
+        btgGender.add(rbNam);
+        btgGender.add(rbNu);
+        btgRole.add(rbAdmin);
+        btgRole.add(rbDeliver);
+    }
     
     private void createTableLastColumnCellEvent(){
          TableActionEvent event = new TableActionEvent() {
@@ -320,6 +327,8 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btgGender = new javax.swing.ButtonGroup();
+        btgRole = new javax.swing.ButtonGroup();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbCategory = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -334,22 +343,22 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
         lblQLNV = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         txtSearch = new swing.MyTextField();
-        btnLuu = new button.Button();
-        btnChooseImage = new button.Button();
-        btnRefesh = new button.Button();
+        btnLuu = new utils.Button();
+        btnChooseImage = new utils.Button();
+        btnRefesh = new utils.Button();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         txtEmployeeName1 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
-        radioNu = new javax.swing.JRadioButton();
-        radioNam = new javax.swing.JRadioButton();
+        rbNu = new javax.swing.JRadioButton();
+        rbNam = new javax.swing.JRadioButton();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         txtPhoneNumber = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
-        radioDeliver = new javax.swing.JRadioButton();
-        radioAdmin = new javax.swing.JRadioButton();
+        rbDeliver = new javax.swing.JRadioButton();
+        rbAdmin = new javax.swing.JRadioButton();
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -503,11 +512,11 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
         txtEmail.setEditable(false);
         add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 210, 355, 34));
 
-        radioNu.setText("Nữ");
-        add(radioNu, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 270, -1, -1));
+        rbNu.setText("Nữ");
+        add(rbNu, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 270, -1, -1));
 
-        radioNam.setText("Nam");
-        add(radioNam, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, -1, -1));
+        rbNam.setText("Nam");
+        add(rbNam, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, -1, -1));
 
         jLabel10.setText("Email:");
         add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, -1, -1));
@@ -521,11 +530,11 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
         jLabel12.setText("Chức vụ:");
         add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 150, -1, -1));
 
-        radioDeliver.setText("Deliver");
-        add(radioDeliver, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 150, -1, -1));
+        rbDeliver.setText("Deliver");
+        add(rbDeliver, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 150, -1, -1));
 
-        radioAdmin.setText("Admin");
-        add(radioAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 150, -1, -1));
+        rbAdmin.setText("Admin");
+        add(rbAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 150, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
@@ -599,9 +608,11 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     }//GEN-LAST:event_btnRefeshActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private button.Button btnChooseImage;
-    private button.Button btnLuu;
-    private button.Button btnRefesh;
+    private javax.swing.ButtonGroup btgGender;
+    private javax.swing.ButtonGroup btgRole;
+    private utils.Button btnChooseImage;
+    private utils.Button btnLuu;
+    private utils.Button btnRefesh;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -618,10 +629,10 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     private javax.swing.JLabel lbImage;
     private javax.swing.JLabel lblQLNV;
     private javax.swing.JPanel pnImage;
-    private javax.swing.JRadioButton radioAdmin;
-    private javax.swing.JRadioButton radioDeliver;
-    private javax.swing.JRadioButton radioNam;
-    private javax.swing.JRadioButton radioNu;
+    private javax.swing.JRadioButton rbAdmin;
+    private javax.swing.JRadioButton rbDeliver;
+    private javax.swing.JRadioButton rbNam;
+    private javax.swing.JRadioButton rbNu;
     private javax.swing.JTable tbCategory;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtEmployeeName1;

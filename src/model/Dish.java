@@ -16,7 +16,7 @@ public class Dish {
     private double price;
     private int inStock;
     private String imageUrl;
-    private String categoryId;
+    private Category category;
 
     public String getDishID() {
         return dishID;
@@ -66,12 +66,12 @@ public class Dish {
         this.imageUrl = imageUrl;
     }
 
-    public String getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
 }

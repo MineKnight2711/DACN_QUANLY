@@ -355,9 +355,9 @@ public class FormVoucher extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         txtSearch = new swing.MyTextField();
-        btnLuu = new button.Button();
-        btnChooseImage = new button.Button();
-        btnRefesh = new button.Button();
+        btnLuu = new utils.Button();
+        btnChooseImage = new utils.Button();
+        btnRefesh = new utils.Button();
         jLabel6 = new javax.swing.JLabel();
         txtCategoryName1 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -618,10 +618,10 @@ public class FormVoucher extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChooseExpired;
-    private button.Button btnChooseImage;
+    private utils.Button btnChooseImage;
     private javax.swing.JButton btnChooseStart;
-    private button.Button btnLuu;
-    private button.Button btnRefesh;
+    private utils.Button btnLuu;
+    private utils.Button btnRefesh;
     private com.raven.datechooser.DateChooser dateExpired;
     private com.raven.datechooser.DateChooser dateStart;
     private javax.swing.JLabel jLabel1;

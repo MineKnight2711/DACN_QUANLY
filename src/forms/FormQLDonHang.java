@@ -338,8 +338,8 @@ public class FormQLDonHang extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         txtSearch = new swing.MyTextField();
-        btnXemChiTiet = new button.Button();
-        btnRefesh = new button.Button();
+        btnXemChiTiet = new utils.Button();
+        btnRefesh = new utils.Button();
         jLabel6 = new javax.swing.JLabel();
         txtPaymentMethod = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -348,7 +348,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         btnChooseExpired = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         txtIDVoucher1 = new javax.swing.JTextField();
-        btnPrint = new button.Button();
+        btnPrint = new utils.Button();
         txtIDVoucher2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtVoucher = new javax.swing.JTextField();
@@ -567,9 +567,9 @@ public class FormQLDonHang extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChooseExpired;
-    private button.Button btnPrint;
-    private button.Button btnRefesh;
-    private button.Button btnXemChiTiet;
+    private utils.Button btnPrint;
+    private utils.Button btnRefesh;
+    private utils.Button btnXemChiTiet;
     private com.raven.datechooser.DateChooser dateExpired;
     private com.raven.datechooser.DateChooser dateStart;
     private javax.swing.JLabel jLabel1;

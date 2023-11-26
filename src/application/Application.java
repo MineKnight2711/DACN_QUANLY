@@ -67,6 +67,7 @@ public class Application extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbExit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lbExit.setForeground(new java.awt.Color(153, 153, 153));
@@ -78,21 +79,7 @@ public class Application extends javax.swing.JFrame {
                 lbExitMouseClicked(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 679, Short.MAX_VALUE)
-                .addComponent(lbExit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(lbExit, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 492, Short.MAX_VALUE))
-        );
+        getContentPane().add(lbExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(679, 0, 40, 29));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

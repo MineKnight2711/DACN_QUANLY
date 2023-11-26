@@ -1,2 +1,2 @@
 # Source template:
-# Các libary sủ dụng :
+# Các libary sử dụng :

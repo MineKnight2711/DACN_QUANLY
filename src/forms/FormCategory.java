@@ -15,10 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon; 
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -350,11 +348,11 @@ public class FormCategory extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
-        txtSearch = new swing.MyTextField();
         btnLuu = new utils.Button();
         btnChooseImage = new utils.Button();
         btnRefesh = new utils.Button();
         jLabel5 = new javax.swing.JLabel();
+        txtSearch = new javax.swing.JTextField();
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -438,25 +436,6 @@ public class FormCategory extends javax.swing.JPanel {
         });
         add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, -1, -1));
 
-        txtSearch.setForeground(new java.awt.Color(153, 153, 153));
-        txtSearch.setPrefixIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/search_small.png"))); // NOI18N
-        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txtSearchMouseClicked(evt);
-            }
-        });
-        txtSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSearchActionPerformed(evt);
-            }
-        });
-        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtSearchKeyReleased(evt);
-            }
-        });
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 420, 30));
-
         btnLuu.setBackground(new java.awt.Color(30, 180, 114));
         btnLuu.setForeground(new java.awt.Color(245, 245, 245));
         btnLuu.setText("Lưu");
@@ -495,6 +474,7 @@ public class FormCategory extends javax.swing.JPanel {
 
         jLabel5.setText("Đường dẫn");
         add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 230, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
@@ -510,28 +490,6 @@ public class FormCategory extends javax.swing.JPanel {
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
         System.exit(0);
     }//GEN-LAST:event_lbExit1MouseClicked
-
-    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
-        if (search.getItemSize() > 0) {
-            menu.show(txtSearch, 0, txtSearch.getHeight());
-        }
-    }//GEN-LAST:event_txtSearchMouseClicked
-
-    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtSearchActionPerformed
-
-    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
-        String text = txtSearch.getText().trim().toLowerCase();
-        search.setData(search(text));
-        if (search.getItemSize() > 0) {
-            //  * 2 top and bot border
-            menu.show(txtSearch, 0, txtSearch.getHeight());
-            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-        } else {
-            menu.setVisible(false);
-        }
-    }//GEN-LAST:event_txtSearchKeyReleased
 
     private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
         String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
@@ -585,7 +543,7 @@ public class FormCategory extends javax.swing.JPanel {
     private javax.swing.JPanel pnImage;
     private javax.swing.JTable tbCategory;
     private javax.swing.JTextField txtCategoryName;
-    private swing.MyTextField txtSearch;
+    private javax.swing.JTextField txtSearch;
     private javax.swing.JTextField txtUrl;
     // End of variables declaration//GEN-END:variables
 }

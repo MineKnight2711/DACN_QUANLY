@@ -1,4 +1,4 @@
-package swing;
+package utils;
 
 import java.awt.Color;
 import java.awt.Graphics;

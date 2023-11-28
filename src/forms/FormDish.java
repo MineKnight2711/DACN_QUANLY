@@ -420,11 +420,11 @@ public class FormDish extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
-        txtSearch = new swing.MyTextField();
         btnSave = new utils.Button();
         circleProgress = new utils.spinner_progress.SpinnerProgress();
         btnUpdate = new utils.Button();
         btnAdd = new utils.Button();
+        txtSearch = new javax.swing.JTextField();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -602,20 +602,6 @@ public class FormDish extends javax.swing.JPanel {
         });
         add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, -1, -1));
 
-        txtSearch.setForeground(new java.awt.Color(153, 153, 153));
-        txtSearch.setPrefixIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/search_small.png"))); // NOI18N
-        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                txtSearchMouseClicked(evt);
-            }
-        });
-        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtSearchKeyReleased(evt);
-            }
-        });
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 420, 30));
-
         btnSave.setBackground(new java.awt.Color(30, 180, 114));
         btnSave.setForeground(new java.awt.Color(245, 245, 245));
         btnSave.setText("Lưu");
@@ -657,6 +643,7 @@ public class FormDish extends javax.swing.JPanel {
             }
         });
         add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 340, 70, -1));
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 320, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void enableEdit()
@@ -742,24 +729,6 @@ public class FormDish extends javax.swing.JPanel {
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
         System.exit(0);
     }//GEN-LAST:event_lbExit1MouseClicked
-
-    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
-        if (search.getItemSize() > 0) {
-            menu.show(txtSearch, 0, txtSearch.getHeight());
-        }
-    }//GEN-LAST:event_txtSearchMouseClicked
-
-    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
-        String text = txtSearch.getText().trim().toLowerCase();
-        search.setData(search(text));
-        if (search.getItemSize() > 0) {
-            //  * 2 top and bot border
-            menu.show(txtSearch, 0, txtSearch.getHeight());
-            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-        } else {
-            menu.setVisible(false);
-        }
-    }//GEN-LAST:event_txtSearchKeyReleased
     private void createNewDish(){
         Dish newDish=new Dish();
         newDish.setDishName(txtDishName.getText());
@@ -898,6 +867,6 @@ public class FormDish extends javax.swing.JPanel {
     private javax.swing.JTextField txtDishName;
     private javax.swing.JTextField txtInstock;
     private javax.swing.JTextField txtPrice;
-    private swing.MyTextField txtSearch;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

@@ -151,12 +151,12 @@ public class FormDish extends javax.swing.JPanel {
         tbDish.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event));
         for (int i = 0; i <= 4; i++) {
             tbDish.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
-                setHorizontalAlignment(SwingConstants.CENTER);
-                return super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
-            }
-        });
+                @Override
+                public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                    return super.getTableCellRendererComponent(jtable, o, bln, bln1, i, i1);
+                }
+            });
         }
     }
     private void refesh(){

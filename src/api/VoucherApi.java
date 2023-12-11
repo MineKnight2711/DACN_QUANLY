@@ -41,7 +41,7 @@ public class VoucherApi
         return response.toString();
     }
 
-    public String createNewDish(String newVoucher) throws IOException, InterruptedException {
+    public String createNewVoucher(String newVoucher) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
   
         HttpRequest request = HttpRequest.newBuilder()
@@ -52,6 +52,33 @@ public class VoucherApi
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
   
-  return response.body();
+        return response.body();
+    }
+    public String updateVoucher(String newVoucher) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+  
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(BaseURL.BASE_URL+"voucher"))
+          .PUT(HttpRequest.BodyPublishers.ofString(newVoucher))
+          .header("Content-Type", "application/json")
+          .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+  
+        return response.body();
+    }
+    public String deleteVoucher(String voucherId) throws IOException, InterruptedException {
+        
+        HttpClient client = HttpClient.newHttpClient();
+  
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(BaseURL.BASE_URL+"voucher/"+voucherId))
+          .DELETE()
+          .header("Content-Type", "application/json")
+          .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+  
+        return response.body();
     }
 }

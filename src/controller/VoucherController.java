@@ -39,7 +39,35 @@ public class VoucherController
     public String createNewVoucher(Voucher newVoucher) 
     {
         try {
-            String apiResult=voucherApi.createNewDish(jsonHandle.toJson(newVoucher));
+            String apiResult=voucherApi.createNewVoucher(jsonHandle.toJson(newVoucher));
+            ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
+            if(responseModel.getMessage().equals("Success")){
+                return responseModel.getMessage();
+            }
+            return responseModel.getMessage();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "Fail";
+        }
+    }
+    public String updateVoucher(Voucher newVoucher) 
+    {
+        try {
+            String apiResult=voucherApi.updateVoucher(jsonHandle.toJson(newVoucher));
+            ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
+            if(responseModel.getMessage().equals("Success")){
+                return responseModel.getMessage();
+            }
+            return responseModel.getMessage();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "Fail";
+        }
+    }
+    public String deleteVoucher(String voucherId) 
+    {
+        try {
+            String apiResult=voucherApi.deleteVoucher(voucherId);
             ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
             if(responseModel.getMessage().equals("Success")){
                 return responseModel.getMessage();

@@ -4,16 +4,13 @@ import controller.VoucherController;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.BorderFactory;
@@ -21,23 +18,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
-import model.Category;
-import model.Dish;
 import model.Voucher;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
 import utils.ImageCellRender;
-import utils.ImageLoader;
 import utils.PanelSearch;
-import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
 import utils.table.TableActionCellRender;
 import utils.table.TableActionEvent;
@@ -51,6 +43,8 @@ public class FormVoucher extends javax.swing.JPanel {
     private NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private boolean isEditingEnabled = false,isAddEnabled = false;
     private String selectedVoucherType="";
+    private int selectedRow=0;
+    private Voucher selectedVoucher;
     public FormVoucher() {
         initComponents();
       
@@ -89,7 +83,13 @@ public class FormVoucher extends javax.swing.JPanel {
          TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row : " + row);
+                if(row != selectedRow) {
+                    return ;
+                } else {
+                    isEditingEnabled = true;
+                    isAddEnabled = false;
+                    enableEdit();
+                }
             }
 
             @Override
@@ -98,8 +98,8 @@ public class FormVoucher extends javax.swing.JPanel {
                     tbVoucher.getCellEditor().stopCellEditing();
                 }
                 DefaultTableModel model = (DefaultTableModel) tbVoucher.getModel();
-                String categoryId = (String) model.getValueAt(row, 0);
-//                deleteCategory(categoryId);
+                String voucherId = (String) model.getValueAt(row, 0);
+                deleteVoucher(voucherId);
 //                if(deleteCategory(categoryId)){
 //                    model.removeRow(row);
 //                }
@@ -125,13 +125,26 @@ public class FormVoucher extends javax.swing.JPanel {
     }
     private void refesh(){
         txtVoucherName.setText("");
+        txtPointsRequired.setText("");
         txtDiscountAmount.setText("");
         txtDiscountPercent.setText("");
         txtDateBegin.setText("");
         txtDateExpired.setText("");
+        txtVoucherName.setEditable(false);
+        txtPointsRequired.setEditable(false);
+        txtDiscountAmount.setEditable(false);
+        txtDiscountPercent.setEditable(false);
+        txtDateBegin.setEditable(false);
+        txtDateExpired.setEditable(false);
+        btnSave.setVisible(false);
+        btnUpdate.setVisible(false);
+        btnAdd.setVisible(false);
+//        dateExpired.setSelectedDate(null);
+//        dateStart.setSelectedDate(null);
         vouchers=null;
         getAllVoucher();
     }
+
      private void getAllVoucher()
     {
         List<Voucher> vouchersResult=voucherController.getAllVoucher();
@@ -140,7 +153,9 @@ public class FormVoucher extends javax.swing.JPanel {
             loadVoucherTable();   
         }
         else
-            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có voucher!");
+        {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có voucher!"); 
+        }
     }
      
 //    private boolean deleteCategory(String categoryId)
@@ -161,7 +176,7 @@ public class FormVoucher extends javax.swing.JPanel {
                 DefaultTableModel model = (DefaultTableModel) tbVoucher.getModel();
                 model.setRowCount(0);
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                // Load vouchers first
+
                 for (Voucher voucher : vouchers) {
                   
                     String voucherId = voucher.getVoucherID();
@@ -175,7 +190,7 @@ public class FormVoucher extends javax.swing.JPanel {
                     Integer pointsRequeired = voucher.getPointRequired();
                     model.addRow(new Object[]{voucherId, voucherName, startDate,expDate,discountAmount,discountPercent,type,pointsRequeired});
                 }
-//                createTableRowClick();
+                createTableRowClick();
                 
                 TableColumn imageColumn = tbVoucher.getColumnModel().getColumn(2);
                 imageColumn.setCellRenderer(new ImageCellRender());
@@ -254,8 +269,7 @@ public class FormVoucher extends javax.swing.JPanel {
             btnSave.setEnabled(true);
             txtPointsRequired.setEditable(true);
             txtVoucherName.setEditable(true);
-            txtDiscountAmount.setEditable(true);
-            txtDiscountPercent.setEditable(true);
+            checkComboxBoxIndex();
             txtDateBegin.setEditable(true);
             txtDateExpired.setEditable(true);
         }
@@ -263,10 +277,10 @@ public class FormVoucher extends javax.swing.JPanel {
             btnUpdate.setVisible(true);
             btnUpdate.setEnabled(true);
             btnSave.setVisible(false);
+            btnAdd.setVisible(false);
             txtPointsRequired.setEditable(true);
             txtVoucherName.setEditable(true);
-            txtDiscountAmount.setEditable(true);
-            txtDiscountPercent.setEditable(true);
+            checkComboxBoxIndex();
             txtDateBegin.setEditable(true);
              txtDateExpired.setEditable(true);
         }
@@ -277,43 +291,38 @@ public class FormVoucher extends javax.swing.JPanel {
             btnUpdate.setEnabled(false);
             txtPointsRequired.setEditable(false);
             txtVoucherName.setEditable(false);
-            txtDiscountAmount.setEditable(false);
-            txtDiscountPercent.setEditable(false);
+            checkComboxBoxIndex();
             txtDateBegin.setEditable(false);
             txtDateExpired.setEditable(true);
         }
     }
-//    private void createTableRowClick(){
-//        tbCategory.addMouseListener(new MouseAdapter(){
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//
-//                int selectedRow = tbCategory.getSelectedRow();
-//                if(selectedRow < 0 || selectedRow == 6)
-//                    return;
-//                if (selectedRow >= 0) {
-//                    try {
-//                        Category selectedCategory = vouchers.get(selectedRow);
-//                        txtVoucherName.setText(selectedCategory.getCategoryName());
-//                    } catch (Exception ex) {
-//                        System.out.println("Image error");
-//                    }
-//                }
-//            }
-//        });
-//    }
-//    class ImageRenderer extends DefaultTableCellRenderer {
-//        @Override
-//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//            if (value instanceof Icon icon) {
-//                setIcon(icon);
-//            } else {
-//                setText((value == null) ? "" : value.toString());
-//            }
-//            setHorizontalAlignment(JLabel.CENTER);
-//            return this;
-//        }
-//    }
+    private void createTableRowClick(){
+        tbVoucher.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                selectedRow = tbVoucher.getSelectedRow();
+                int modelRowIndex = tbVoucher.convertRowIndexToModel(selectedRow);
+                if(modelRowIndex < 0 || selectedRow == 8)
+                    return;
+                if (modelRowIndex >= 0) {
+                    isAddEnabled=false;
+                    isEditingEnabled=false;
+                    enableEdit();
+                    selectedVoucher = vouchers.get(selectedRow);
+                    txtVoucherName.setText(selectedVoucher.getVoucherName());
+                    txtPointsRequired.setText(String.valueOf(selectedVoucher.getPointRequired()));
+                    txtDiscountPercent.setText(String.valueOf(selectedVoucher.getDiscountPercent()));
+                    txtDiscountAmount.setText(String.valueOf(selectedVoucher.getDiscountAmount()));
+//                    txtDateBegin.setText(fmt.format(selectedVoucher.getStartDate()));
+//                    txtDateExpired.setText(fmt.format(selectedVoucher.getExpDate()));
+                    dateStart.setSelectedDate(selectedVoucher.getStartDate());
+                    dateExpired.setSelectedDate(selectedVoucher.getExpDate());
+                }
+            }
+        });
+    }
+
     private void comboxBoxValueChangeEvent()
     {
         checkComboxBoxIndex();
@@ -323,19 +332,21 @@ public class FormVoucher extends javax.swing.JPanel {
              }
          });
     }
-    private void checkComboxBoxIndex()
+    private String checkComboxBoxIndex()
     {
         if (cmbType.getSelectedIndex()==0) 
         {
             selectedVoucherType="Percent";
             txtDiscountAmount.setEditable(false);
             txtDiscountPercent.setEditable(true);
+            return selectedVoucherType;
         }
         else
         {
             selectedVoucherType="Amount";
             txtDiscountAmount.setEditable(true);
             txtDiscountPercent.setEditable(false);
+            return selectedVoucherType;
         }
     }
 
@@ -447,7 +458,7 @@ public class FormVoucher extends javax.swing.JPanel {
                 btnSaveActionPerformed(evt);
             }
         });
-        add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 270, 160, 60));
+        add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 290, 160, 40));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -459,13 +470,13 @@ public class FormVoucher extends javax.swing.JPanel {
                 btnRefeshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 270, 140, 60));
+        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 290, 140, 40));
 
         jLabel6.setText("Ngày bắt đầu sử dụng:");
         add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 100, -1, -1));
 
         txtDiscountAmount.setEditable(false);
-        add(txtDiscountAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 190, 30));
+        add(txtDiscountAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 190, 190, 30));
 
         jLabel7.setText("Điểm cần đổi");
         add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 200, -1, -1));
@@ -508,11 +519,11 @@ public class FormVoucher extends javax.swing.JPanel {
         add(cmbType, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 140, 190, 30));
 
         txtDiscountPercent.setEditable(false);
-        add(txtDiscountPercent, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 190, 190, 30));
+        add(txtDiscountPercent, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 190, 30));
 
         progressLoading.setForeground(new java.awt.Color(255, 204, 51));
         progressLoading.setIndeterminate(true);
-        add(progressLoading, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 280, 40, 40));
+        add(progressLoading, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 290, 30, 30));
 
         btnUpdate.setBackground(new java.awt.Color(30, 180, 114));
         btnUpdate.setForeground(new java.awt.Color(245, 245, 245));
@@ -525,7 +536,7 @@ public class FormVoucher extends javax.swing.JPanel {
                 btnUpdateActionPerformed(evt);
             }
         });
-        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 270, 160, 60));
+        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 290, 160, 40));
 
         btnAdd.setBackground(new java.awt.Color(30, 180, 114));
         btnAdd.setForeground(new java.awt.Color(245, 245, 245));
@@ -537,7 +548,7 @@ public class FormVoucher extends javax.swing.JPanel {
                 btnAddActionPerformed(evt);
             }
         });
-        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 280, 140, 50));
+        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 289, 140, -1));
 
         txtPointsRequired.setEditable(false);
         add(txtPointsRequired, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 190, 190, 30));
@@ -556,11 +567,11 @@ public class FormVoucher extends javax.swing.JPanel {
         newVoucher.setType(selectedVoucherType);
         if(selectedVoucherType.equals("Percent"))
         {
-            newVoucher.setDiscountAmount(Double.valueOf(txtDiscountAmount.getText()));
+            newVoucher.setDiscountPercent(Integer.valueOf(txtDiscountPercent.getText()));
         }
         else
         {
-            newVoucher.setDiscountPercent(Integer.valueOf(txtDiscountPercent.getText()));
+            newVoucher.setDiscountAmount(Double.valueOf(txtDiscountAmount.getText()));
         }
         newVoucher.setStartDate(dateStart.getSelectedDate());
         newVoucher.setExpDate(dateExpired.getSelectedDate());
@@ -578,6 +589,48 @@ public class FormVoucher extends javax.swing.JPanel {
             progressLoading.setVisible(false);
         }
         
+    }
+    private void updateDish()
+    {
+        if(selectedVoucher!=null)
+        {
+            Voucher updatedVoucher=selectedVoucher;
+            updatedVoucher.setVoucherName(txtVoucherName.getText());
+            updatedVoucher.setPointRequired(Integer.valueOf(txtPointsRequired.getText()));
+            updatedVoucher.setType(checkComboxBoxIndex());
+            if(checkComboxBoxIndex().equals("Percent"))
+            {
+                updatedVoucher.setDiscountPercent(Integer.valueOf(txtDiscountPercent.getText()));
+            }
+            else
+            {
+                updatedVoucher.setDiscountAmount(Double.valueOf(txtDiscountAmount.getText()));
+            }
+            updatedVoucher.setStartDate(dateStart.getSelectedDate());
+            updatedVoucher.setExpDate(dateExpired.getSelectedDate());
+            
+            String result=voucherController.updateVoucher(selectedVoucher);
+            
+            if(result.equals("Success")){
+                Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Cập nhật voucher thành công!");
+                refesh(); 
+            }
+            else{
+                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+            }
+        }
+    }
+    private boolean deleteVoucher(String voucherId){
+        String result=voucherController.deleteVoucher(voucherId);
+        if(result.equals("Success")){
+            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Xoá voucher thành công!");
+            refesh(); 
+            return true;
+        }
+        else{
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+            return false;
+        }
     }
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         progressLoading.setVisible(true);
@@ -608,7 +661,19 @@ public class FormVoucher extends javax.swing.JPanel {
     }//GEN-LAST:event_btnChooseExpiredActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
+        progressLoading.setVisible(true);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                updateDish();
+                return null;
+            }
+            @Override
+            protected void done() {
+                progressLoading.setVisible(false);
+            }
+        };
+        worker.execute();
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed

@@ -242,10 +242,10 @@ public class FormCategory extends javax.swing.JPanel {
             if (d.toLowerCase().contains(search)) {
                 boolean story = isStory(d);
                 if (story) {
-                    list.add(0, new DataSearch(d, story));
+//                    list.add(0, new DataSearch(d, story));
                     //  add or insert to first record
                 } else {
-                    list.add(new DataSearch(d, story));
+//                    list.add(new DataSearch(d, story));
                     //  add to last record
                 }
                 if (list.size() == limitData) {

@@ -7,7 +7,6 @@ package utils;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,13 +27,7 @@ public class Search_Item extends javax.swing.JPanel {
         addEventMouse(lbText);
         addEventMouse(lbRemove);
         lbText.setText(data.getText());
-        if (data.isStory()) {
-            lbText.setForeground(new Color(29, 106, 205));
-            lbIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/time.png")));
-            lbRemove.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        } else {
-            lbRemove.setText("");
-        }
+        lbRemove.setText("");
     }
 
     private void addEventMouse(Component com) {

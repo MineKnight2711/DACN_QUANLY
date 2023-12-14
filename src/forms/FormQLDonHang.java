@@ -1,42 +1,29 @@
 package forms;
 
-import controller.CategoryController;
+
 import controller.OrderController;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
-import model.Category;
 import model.OrderDTO;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
-import utils.ImageCellRender;
-import utils.ImageLoader;
 import utils.PanelSearch;
-import utils.spinner_progress.SpinnerProgress;
-import utils.table.TableActionCellEditor;
-import utils.table.TableActionCellRender;
-import utils.table.TableActionEvent;
+import utils.Search_Item;
+
 
 
 /**
@@ -47,6 +34,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private final OrderController orderController;
     private List<OrderDTO> orders;
     private OrderDTO selectedOrder;
+    private boolean isShowDetailsEnabled=false;
     private JPopupMenu menu;
     private PanelSearch search;
     public FormQLDonHang() {
@@ -55,31 +43,57 @@ public class FormQLDonHang extends javax.swing.JPanel {
         orderController=new OrderController();
         createTableLastColumnCellEvent();
         getAllOrders();
-        
-        
+        createSearchTextField();
+    }
+    
+    private void createSearchTextField()
+    {
         menu = new JPopupMenu();
         search = new PanelSearch();
+        
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
         menu.add(search);
+
         menu.setFocusable(false);
         search.addEventClick(new EventClick() {
             @Override
             public void itemClick(DataSearch data) {
                 menu.setVisible(false);
                 txtSearch.setText(data.getText());
+                switch (cmbSearchType.getSelectedIndex()) {
+                    case 0 -> {
+                        selectedOrder=orders.stream().filter((OrderDTO order) -> order.getOrder().getOrderID().equals(data.getText())).findFirst().orElse(null);
+                        if(selectedOrder!=null)
+                        {
+                            isShowDetailsEnabled=true;
+                            enableEdit();
+                            orders.removeIf(order -> !order.getOrder().getOrderID().equals(data.getText()));
+                            loadOrdersTable();
+                            fillTextField(selectedOrder);
+                            
+                        }
+                    }
+                    case 1 -> {
+                        selectedOrder=orders.stream().filter((OrderDTO order) -> order.getOrder().getAccount().getPhoneNumber().equals(data.getText())).findFirst().orElse(null);
+                        if(selectedOrder!=null)
+                        {
+                            isShowDetailsEnabled=true;
+                            enableEdit();
+                            orders.removeIf(order -> !order.getOrder().getOrderID().equals(data.getText()));
+                            loadOrdersTable();
+                            fillTextField(selectedOrder);
+                        }
+                        
+                    }
+                    default -> {
+                    }
+                }
                 
-                System.out.println("Click Item : " + data.getText());
             }
 
             @Override
             public void itemRemove(Component com, DataSearch data) {
-                search.remove(com);
-                removeHistory(data.getText());
-                menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-                if (search.getItemSize() == 0) {
-                    menu.setVisible(false);
-                }
-                System.out.println("Remove Item : " + data.getText());
+             
             }
         });
     }
@@ -97,7 +111,9 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private void refesh(){
         txtOrderId.setText("");
         txtAccountID.setText("");
+        txtVoucherId.setText("");
         orders=null;
+        isShowDetailsEnabled=false;
         getAllOrders();
     }
      private void getAllOrders(){
@@ -105,6 +121,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         if(categoriesResult!=null){
             orders=categoriesResult;
             loadOrdersTable();   
+            enableEdit();
         }
         else
             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có danh mục!");
@@ -152,64 +169,30 @@ public class FormQLDonHang extends javax.swing.JPanel {
     }
 
 
-    private List<DataSearch> search(String search) {
-        int limitData = 7;
-        List<DataSearch> list = new ArrayList<>();
-        String dataTesting[] = {"300 - Rise of an Empire",
-            "Cosmic Sin",
-            "Deadlock",
-            "Deliver Us from Eva",
-            "Empire of the Ants",
-            "Empire of the Sun",
-            "Empire Records",
-            "Empire State",
-            "Four Good Days",
-            "Frozen Fever",
-            "Frozen",
-            "The Courier",
-            "The First Purge",
-            "To Olivia",
-            "Underworld"};
-        for (String d : dataTesting) {
-            if (d.toLowerCase().contains(search)) {
-                boolean story = isStory(d);
-                if (story) {
-                    list.add(0, new DataSearch(d, story));
-                    //  add or insert to first record
-                } else {
-                    list.add(new DataSearch(d, story));
-                    //  add to last record
-                }
-                if (list.size() == limitData) {
-                    break;
-                }
-            }
-        }
-        return list;
-    }
-    String dataStory[] = {"300 - Rise of an Empire",
-        "Empire Records",
-        "Empire State",
-        "Frozen",
-        "The Courier"};
+    
+//    String dataStory[] = {"300 - Rise of an Empire",
+//        "Empire Records",
+//        "Empire State",
+//        "Frozen",
+//        "The Courier"};
 
-    private void removeHistory(String text) {
-        for (int i = 0; i < dataStory.length; i++) {
-            String d = dataStory[i];
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                dataStory[i] = "";
-            }
-        }
-    }
+//    private void removeHistory(String text) {
+//        for (int i = 0; i < dataStory.length; i++) {
+//            String d = dataStory[i];
+//            if (d.toLowerCase().equals(text.toLowerCase())) {
+//                dataStory[i] = "";
+//            }
+//        }
+//    }
 
-    private boolean isStory(String text) {
-        for (String d : dataStory) {
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean isStory(String text) {
+//        for (String d : dataStory) {
+//            if (d.toLowerCase().equals(text.toLowerCase())) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
     
     private void createTableRowClick(){
         tbOrder.addMouseListener(new MouseAdapter(){
@@ -221,28 +204,30 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 if(modelRowIndex < 0 || modelRowIndex == 10)
                     return;
                 if (modelRowIndex >= 0) {
+                    isShowDetailsEnabled=true;
+                    enableEdit();
                     selectedOrder= orders.get(modelRowIndex);
-                    txtOrderId.setText(selectedOrder.getOrder().getOrderID());
-                    txtAccountID.setText(selectedOrder.getOrder().getAccount().getFullName());
-                    txtVoucherId.setText(selectedOrder.getOrder().getVoucher()!= null ? selectedOrder.getOrder().getVoucher().getVoucherID(): "Không có");
+                    fillTextField(selectedOrder);
                 }
             }
         });
     }
-//    class ImageRenderer extends DefaultTableCellRenderer {
-//        @Override
-//        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//            if (value instanceof Icon icon) {
-//                setIcon(icon);
-//            } else {
-//                setText((value == null) ? "" : value.toString());
-//            }
-//            setHorizontalAlignment(JLabel.CENTER);
-//            return this;
-//        }
-//    }
-    
+    private void fillTextField(OrderDTO od){
+          txtOrderId.setText(od.getOrder().getOrderID());
+                    txtAccountID.setText(od.getOrder().getAccount().getFullName());
+                    txtVoucherId.setText(od.getOrder().getVoucher()!= null ? selectedOrder.getOrder().getVoucher().getVoucherID(): "Không có");
+    }
+        
+    private void enableEdit()
+    {
+        if(isShowDetailsEnabled){
+            btnShowDetails.setEnabled(true);
 
+        }
+        else{
+            btnShowDetails.setEnabled(false);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -259,7 +244,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
-        btnXemChiTiet = new utils.Button();
+        btnShowDetails = new utils.Button();
         btnRefesh = new utils.Button();
         jLabel11 = new javax.swing.JLabel();
         btnUpdate = new utils.Button();
@@ -268,6 +253,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         cmbOrderStatus = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
         txtVoucherId = new javax.swing.JTextField();
+        cmbSearchType = new javax.swing.JComboBox<>();
 
         dateStart.setForeground(new java.awt.Color(255, 102, 51));
 
@@ -333,17 +319,17 @@ public class FormQLDonHang extends javax.swing.JPanel {
         });
         add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, -1, -1));
 
-        btnXemChiTiet.setBackground(new java.awt.Color(30, 180, 114));
-        btnXemChiTiet.setForeground(new java.awt.Color(245, 245, 245));
-        btnXemChiTiet.setText("Xem chi tiết đơn hàng");
-        btnXemChiTiet.setRippleColor(new java.awt.Color(255, 255, 255));
-        btnXemChiTiet.setShadowColor(new java.awt.Color(30, 180, 114));
-        btnXemChiTiet.addActionListener(new java.awt.event.ActionListener() {
+        btnShowDetails.setBackground(new java.awt.Color(30, 180, 114));
+        btnShowDetails.setForeground(new java.awt.Color(245, 245, 245));
+        btnShowDetails.setText("Xem chi tiết đơn hàng");
+        btnShowDetails.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnShowDetails.setShadowColor(new java.awt.Color(30, 180, 114));
+        btnShowDetails.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnXemChiTietActionPerformed(evt);
+                btnShowDetailsActionPerformed(evt);
             }
         });
-        add(btnXemChiTiet, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 150, 45));
+        add(btnShowDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 150, 45));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -367,7 +353,18 @@ public class FormQLDonHang extends javax.swing.JPanel {
 
         txtAccountID.setEditable(false);
         add(txtAccountID, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 90, 200, 30));
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 10, 230, -1));
+
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 20, 340, -1));
 
         cmbOrderStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Đang thực hiện", "Đã hoàn tất" }));
         add(cmbOrderStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 360, 40));
@@ -377,34 +374,77 @@ public class FormQLDonHang extends javax.swing.JPanel {
 
         txtVoucherId.setEditable(false);
         add(txtVoucherId, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 90, 200, 30));
+
+        cmbSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tìm theo mã đơn hàng", "Tìm theo SĐT khách hàng" }));
+        add(cmbSearchType, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 10, -1, 40));
     }// </editor-fold>//GEN-END:initComponents
 
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
         System.exit(0);
     }//GEN-LAST:event_lbExit1MouseClicked
 
-    private void btnXemChiTietActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXemChiTietActionPerformed
-//        String response = categoryController.createCategory(txtIDVoucher.getText(),choosenFile);
-//        if(response.equals("Success")){
-//            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
-//            refesh();   
-//        }
-//        else{
-//             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Thêm danh mục thất bại!");
-//        }
-    }//GEN-LAST:event_btnXemChiTietActionPerformed
+    private void btnShowDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowDetailsActionPerformed
+        FormOrderDetail formOrderDetail=new FormOrderDetail(selectedOrder.getDetailList());
+        formOrderDetail.setVisible(true);
+    }//GEN-LAST:event_btnShowDetailsActionPerformed
 
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
-    
+
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        String text = txtSearch.getText().trim().toLowerCase();
+        search.setData(search(text));
+        if (search.getItemSize() > 0) {
+            //  * 2 top and bot border
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
+        } else {
+            menu.setVisible(false);
+        }
+    }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        if (search.getItemSize() > 0) {
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+        }
+    }//GEN-LAST:event_txtSearchMouseClicked
+    private List<DataSearch> search(String search) {
+        int limitData = 7;
+        List<DataSearch> list = new ArrayList<>();
+        for (OrderDTO d : orders) {
+            switch (cmbSearchType.getSelectedIndex()) {
+                case 0 -> {
+                    if (d.getOrder().getOrderID().toLowerCase().contains(search)) {
+                        list.add(0, new DataSearch(d.getOrder().getOrderID()));
+                        if (list.size() == limitData) {
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 1 -> {
+                    if (d.getOrder().getAccount().getPhoneNumber().contains(search)) {
+                        list.add(0, new DataSearch(d.getOrder().getAccount().getPhoneNumber()));
+                        if (list.size() == limitData) {
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default -> {break;}
+            }
+        }
+        return list;
+    }
      
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private utils.Button btnRefesh;
+    private utils.Button btnShowDetails;
     private utils.Button btnUpdate;
-    private utils.Button btnXemChiTiet;
     private javax.swing.JComboBox<String> cmbOrderStatus;
+    private javax.swing.JComboBox<String> cmbSearchType;
     private com.raven.datechooser.DateChooser dateExpired;
     private com.raven.datechooser.DateChooser dateStart;
     private javax.swing.JLabel jLabel1;

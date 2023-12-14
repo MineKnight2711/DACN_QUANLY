@@ -14,7 +14,7 @@ public class MyTextField extends JTextField {
     
     
     int arcWidth = 10; // Độ cong ngang
-int arcHeight = 10; // Độ cong dọc
+    int arcHeight = 10; // Độ cong dọc
     public Icon getPrefixIcon() {
         return prefixIcon;
     }

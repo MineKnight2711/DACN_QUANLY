@@ -11,6 +11,7 @@ import java.util.List;
 import model.Category;
 import model.Dish;
 import model.LoginResponse;
+import model.OrderDTO;
 import model.ResponseModel;
 import model.Voucher;
 
@@ -43,5 +44,8 @@ public class JsonHandle {
     }
     public List<Voucher> getVouchersFromResponseModel(String listJson) {
         return gson.fromJson(listJson, new TypeToken<List<Voucher>>() {}.getType());
+    }
+    public List<OrderDTO> getOrdersFromResponseModel(String listJson) {
+        return gson.fromJson(listJson, new TypeToken<List<OrderDTO>>() {}.getType());
     }
 }

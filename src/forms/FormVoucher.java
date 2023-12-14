@@ -123,7 +123,7 @@ public class FormVoucher extends javax.swing.JPanel {
             });
         }
     }
-    private void refesh(){
+    private void refresh(){
         txtVoucherName.setText("");
         txtPointsRequired.setText("");
         txtDiscountAmount.setText("");
@@ -163,7 +163,7 @@ public class FormVoucher extends javax.swing.JPanel {
 //        String result=voucherController.deleteCategory(categoryId);
 //        if(result.equals("Success")){
 //            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Xoá danh mục thành công!");
-//            refesh(); 
+//            refresh(); 
 //            return true;
 //        }
 //        else{
@@ -193,7 +193,6 @@ public class FormVoucher extends javax.swing.JPanel {
                 createTableRowClick();
                 
                 TableColumn imageColumn = tbVoucher.getColumnModel().getColumn(2);
-                imageColumn.setCellRenderer(new ImageCellRender());
                 tbVoucher.setRowSorter(new TableRowSorter<>(model));
                 tbVoucher.setRowHeight(30);
         } else {
@@ -364,7 +363,7 @@ public class FormVoucher extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
         btnSave = new utils.Button();
-        btnRefesh = new utils.Button();
+        btnRefresh = new utils.Button();
         jLabel6 = new javax.swing.JLabel();
         txtDiscountAmount = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -460,17 +459,17 @@ public class FormVoucher extends javax.swing.JPanel {
         });
         add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 290, 160, 40));
 
-        btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
-        btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
-        btnRefesh.setText("Làm mới");
-        btnRefesh.setRippleColor(new java.awt.Color(255, 255, 255));
-        btnRefesh.setShadowColor(new java.awt.Color(29, 162, 253));
-        btnRefesh.addActionListener(new java.awt.event.ActionListener() {
+        btnRefresh.setBackground(new java.awt.Color(29, 162, 253));
+        btnRefresh.setForeground(new java.awt.Color(245, 245, 245));
+        btnRefresh.setText("Làm mới");
+        btnRefresh.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnRefresh.setShadowColor(new java.awt.Color(29, 162, 253));
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefeshActionPerformed(evt);
+                btnRefreshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 290, 140, 40));
+        add(btnRefresh, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 290, 140, 40));
 
         jLabel6.setText("Ngày bắt đầu sử dụng:");
         add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 100, -1, -1));
@@ -580,7 +579,7 @@ public class FormVoucher extends javax.swing.JPanel {
         if(result.equals("Success"))
         {
             Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm voucher thành công!");
-            refesh();
+            refresh();
             progressLoading.setVisible(false);
         }
         else
@@ -613,7 +612,7 @@ public class FormVoucher extends javax.swing.JPanel {
             
             if(result.equals("Success")){
                 Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Cập nhật voucher thành công!");
-                refesh(); 
+                refresh(); 
             }
             else{
                 Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
@@ -624,7 +623,7 @@ public class FormVoucher extends javax.swing.JPanel {
         String result=voucherController.deleteVoucher(voucherId);
         if(result.equals("Success")){
             Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Xoá voucher thành công!");
-            refesh(); 
+            refresh(); 
             return true;
         }
         else{
@@ -648,9 +647,9 @@ public class FormVoucher extends javax.swing.JPanel {
         worker.execute();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
-        refesh();
-    }//GEN-LAST:event_btnRefeshActionPerformed
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        refresh();
+    }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnChooseStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseStartActionPerformed
        dateStart.showPopup();
@@ -688,7 +687,7 @@ public class FormVoucher extends javax.swing.JPanel {
     private utils.Button btnAdd;
     private javax.swing.JButton btnChooseExpired;
     private javax.swing.JButton btnChooseStart;
-    private utils.Button btnRefesh;
+    private utils.Button btnRefresh;
     private utils.Button btnSave;
     private utils.Button btnUpdate;
     private javax.swing.JComboBox<String> cmbType;

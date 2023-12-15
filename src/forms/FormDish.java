@@ -39,11 +39,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import model.Category;
 import model.Dish;
+
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
 import utils.ImageCellRender;
 import utils.ImageLoader;
+import utils.ImagePreviewLabel;
 import utils.PanelSearch;
 import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
@@ -73,35 +75,44 @@ public class FormDish extends javax.swing.JPanel {
         loadComboBox();
         createTableLastColumnCellEvent();
         getAllDish();
+        
+        circleProgress.setVisible(false);
+        createSearchTextField();
+        
+        
+    }
+    private void createSearchTextField()
+    {
         menu = new JPopupMenu();
         search = new PanelSearch();
+        
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
         menu.add(search);
+
         menu.setFocusable(false);
-        circleProgress.setVisible(false);
         search.addEventClick(new EventClick() {
             @Override
             public void itemClick(DataSearch data) {
                 menu.setVisible(false);
                 txtSearch.setText(data.getText());
+                selectedDish=listDish.stream().filter((Dish dish) -> dish.getDishName().equals(data.getText())).findFirst().orElse(null);
+                if(selectedDish!=null)
+                {
+                    isEditingEnabled=true;
+                    enableEdit();
+                    listDish.removeIf(dish -> !dish.getDishName().equals(data.getText()));
+                    loadDishTable();
+                    fillTextField(selectedDish);
+
+                }
                 
-                System.out.println("Click Item : " + data.getText());
             }
 
             @Override
             public void itemRemove(Component com, DataSearch data) {
-                search.remove(com);
-                removeHistory(data.getText());
-                menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-                if (search.getItemSize() == 0) {
-                    menu.setVisible(false);
-                }
-                System.out.println("Remove Item : " + data.getText());
+             
             }
         });
-        
-        
-        
     }
     private void loadComboBox(){
         listCategory = categoryController.getAllCategory();
@@ -120,7 +131,30 @@ public class FormDish extends javax.swing.JPanel {
         else
             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Không có danh mục!");
     }
+    private void fillTextField(Dish dish){
+        txtDishName.setText(dish.getDishName());
+        txtInstock.setText(String.valueOf(dish.getInStock()));
+        cmbCategory.setSelectedItem(dish.getCategory());
+        DecimalFormat decimalFormat = new DecimalFormat("0"); 
+        txtPrice.setText(decimalFormat.format(dish.getPrice()));
+        txtDescription.setText(dish.getDescription());
+        ImageLoader loader = new ImageLoader(dish.getImageUrl(), lbImage.getWidth(), lbImage.getHeight());
+        loader.execute();
 
+        loader.addPropertyChangeListener(evt -> {
+        if ("state".equals(evt.getPropertyName()) && 
+           SwingWorker.StateValue.DONE == evt.getNewValue()) {
+
+            try {
+                // Set image on EDT thread
+                ImageIcon icon = loader.get();
+                lbImage.setIcon(icon);
+            } catch (InterruptedException | ExecutionException ex) {
+                System.out.println("Image error");
+            }
+        }
+        });                 
+    }
     private void createTableLastColumnCellEvent(){
          TableActionEvent event = new TableActionEvent() {
             @Override
@@ -163,16 +197,20 @@ public class FormDish extends javax.swing.JPanel {
         isEditingEnabled=false;
         isAddEnabled=false;
         enableEdit();
-        txtDishName.setText("");
-        txtDescription.setText("");
-        txtInstock.setText("");
-        txtPrice.setText("");
+        
         lbImage.setIcon(null);
         choosenFile=null;
         listDish=null;
         getAllDish();
     }
-    
+    private void clearText()
+    {
+        txtDishName.setText("");
+        txtDescription.setText("");
+        txtInstock.setText("");
+        txtPrice.setText("");
+        txtSearch.setText("");
+    }
     private boolean deleteDish(String dishId){
         String result=dishController.deleteDish(dishId);
         if(result.equals("Success")){
@@ -264,66 +302,21 @@ public class FormDish extends javax.swing.JPanel {
     
     
     
-    private List<DataSearch> search(String search) {
+     private List<DataSearch> search(String search) {
         int limitData = 7;
         List<DataSearch> list = new ArrayList<>();
-        String dataTesting[] = {"300 - Rise of an Empire",
-            "Cosmic Sin",
-            "Deadlock",
-            "Deliver Us from Eva",
-            "Empire of the Ants",
-            "Empire of the Sun",
-            "Empire Records",
-            "Empire State",
-            "Four Good Days",
-            "Frozen Fever",
-            "Frozen",
-            "The Courier",
-            "The First Purge",
-            "To Olivia",
-            "Underworld"};
-        for (String d : dataTesting) {
-            if (d.toLowerCase().contains(search)) {
-                boolean story = isStory(d);
-                if (story) {
-//                    list.add(0, new DataSearch(d, story));
-                    //  add or insert to first record
-                } else {
-//                    list.add(new DataSearch(d, story));
-                    //  add to last record
-                }
-                if (list.size() == limitData) {
+        for (Dish d : listDish) {
+            if (d.getDishName().toLowerCase().contains(search)) 
+            {
+                list.add(0, new DataSearch(d.getDishName()));
+                if (list.size() == limitData) 
+                {
                     break;
                 }
             }
         }
         return list;
     }
-    String dataStory[] = {"300 - Rise of an Empire",
-        "Empire Records",
-        "Empire State",
-        "Frozen",
-        "The Courier"};
-
-    private void removeHistory(String text) {
-        for (int i = 0; i < dataStory.length; i++) {
-            String d = dataStory[i];
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                dataStory[i] = "";
-            }
-        }
-    }
-    
-    private boolean isStory(String text) {
-        for (String d : dataStory) {
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    
     
      private void createTableRowClick(){
         tbDish.addMouseListener(new MouseAdapter(){
@@ -425,6 +418,7 @@ public class FormDish extends javax.swing.JPanel {
         btnUpdate = new utils.Button();
         btnAdd = new utils.Button();
         txtSearch = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -522,19 +516,19 @@ public class FormDish extends javax.swing.JPanel {
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(5, 390, 1090, 360));
 
         jLabel4.setText("Ảnh món:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 210, 92, 30));
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 210, 92, 30));
 
         txtInstock.setEditable(false);
-        add(txtInstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 140, 220, 30));
+        add(txtInstock, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 140, 220, 30));
 
         jLabel5.setText("Mô tả món:");
         add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 210, -1, 30));
 
         jLabel6.setText("Giá:");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 80, 60, 24));
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 80, 60, 24));
 
         txtPrice.setEditable(false);
-        add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 80, 220, 30));
+        add(txtPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 80, 220, 30));
 
         txtDescription.setEditable(false);
         txtDescription.setColumns(20);
@@ -546,7 +540,7 @@ public class FormDish extends javax.swing.JPanel {
 
         lbImage.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         lbImage.setPreferredSize(new java.awt.Dimension(200, 200));
-        add(lbImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 190, 220, 190));
+        add(lbImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 190, 220, 190));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -558,7 +552,7 @@ public class FormDish extends javax.swing.JPanel {
                 btnRefeshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 330, 140, -1));
+        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 180, 140, -1));
 
         btnChooseImage.setBackground(new java.awt.Color(253, 83, 83));
         btnChooseImage.setForeground(new java.awt.Color(245, 245, 245));
@@ -571,7 +565,7 @@ public class FormDish extends javax.swing.JPanel {
                 btnChooseImageActionPerformed(evt);
             }
         });
-        add(btnChooseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 330, 140, -1));
+        add(btnChooseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 130, 140, -1));
 
         jLabel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(225, 225, 225)));
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 64, 2000, -1));
@@ -588,7 +582,7 @@ public class FormDish extends javax.swing.JPanel {
         add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 6, 200, 30));
 
         jLabel10.setText("Số lượng tồn :");
-        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 140, 92, 30));
+        add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 140, 92, 30));
 
         lbExit1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lbExit1.setForeground(new java.awt.Color(153, 153, 153));
@@ -600,7 +594,7 @@ public class FormDish extends javax.swing.JPanel {
                 lbExit1MouseClicked(evt);
             }
         });
-        add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, -1, -1));
+        add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, 20, -1));
 
         btnSave.setBackground(new java.awt.Color(30, 180, 114));
         btnSave.setForeground(new java.awt.Color(245, 245, 245));
@@ -613,11 +607,11 @@ public class FormDish extends javax.swing.JPanel {
                 btnSaveActionPerformed(evt);
             }
         });
-        add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 330, 140, -1));
+        add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 80, 140, -1));
 
         circleProgress.setForeground(new java.awt.Color(255, 153, 51));
         circleProgress.setIndeterminate(true);
-        add(circleProgress, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 330, 40, 40));
+        add(circleProgress, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 80, 40, 40));
 
         btnUpdate.setBackground(new java.awt.Color(30, 180, 114));
         btnUpdate.setForeground(new java.awt.Color(245, 245, 245));
@@ -630,11 +624,11 @@ public class FormDish extends javax.swing.JPanel {
                 btnUpdateActionPerformed(evt);
             }
         });
-        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 330, 140, -1));
+        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 80, 140, -1));
 
         btnAdd.setBackground(new java.awt.Color(30, 180, 114));
         btnAdd.setForeground(new java.awt.Color(245, 245, 245));
-        btnAdd.setText("Thêm món");
+        btnAdd.setText("+ Thêm món");
         btnAdd.setRippleColor(new java.awt.Color(255, 255, 255));
         btnAdd.setShadowColor(new java.awt.Color(30, 180, 114));
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -642,8 +636,22 @@ public class FormDish extends javax.swing.JPanel {
                 btnAddActionPerformed(evt);
             }
         });
-        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 340, 70, -1));
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 20, 320, -1));
+        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 260, 140, -1));
+
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 20, 320, 30));
+
+        jLabel11.setText("Tìm kiếm:");
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, 60, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void enableEdit()
@@ -659,6 +667,7 @@ public class FormDish extends javax.swing.JPanel {
             txtDishName.setEditable(true);
             txtInstock.setEditable(true);
             txtPrice.setEditable(true);
+            clearText();
         }
         else if(isEditingEnabled){
             btnUpdate.setVisible(true);
@@ -685,16 +694,7 @@ public class FormDish extends javax.swing.JPanel {
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
-    class ImagePreviewLabel extends JLabel {
-        public ImagePreviewLabel() {
-            super(new ImageIcon());
-        }
-        public void setImage(File f) {
-            ImageIcon icon = new ImageIcon(f.getPath());  
-            icon.setImage(icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH));
-            setIcon(icon);
-        }
-    }
+    
     private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -819,6 +819,24 @@ public class FormDish extends javax.swing.JPanel {
         enableEdit();
     }//GEN-LAST:event_btnAddActionPerformed
 
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        String text = txtSearch.getText().trim().toLowerCase();
+        search.setData(search(text));
+        if (search.getItemSize() > 0) {
+            //  * 2 top and bot border
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
+        } else {
+            menu.setVisible(false);
+        }
+    }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        if (search.getItemSize() > 0) {
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+        }
+    }//GEN-LAST:event_txtSearchMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private utils.Button btnAdd;
@@ -830,6 +848,7 @@ public class FormDish extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cmbCategory;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

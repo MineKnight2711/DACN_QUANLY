@@ -7,6 +7,7 @@ package controller;
 
 import api.CategoryAPI;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import model.Category;
 import model.ResponseModel;
@@ -50,5 +51,19 @@ public class CategoryController {
             return apiResult;
         }
         return apiResult;
+    }
+    
+    public String updateCategory(File choosenFile, Category updatedCategory) {
+        try {
+            String apiResult=categoryAPI.updateCategory(choosenFile, updatedCategory);
+            ResponseModel responseModel=jsonHandle.getResponseFromJson(apiResult);
+            if(responseModel.getMessage().equals("Success")){
+                return responseModel.getMessage();
+            }
+            return responseModel.getMessage();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return "Unknown";
+        }
     }
 }

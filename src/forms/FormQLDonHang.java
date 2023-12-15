@@ -22,8 +22,6 @@ import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
 import utils.PanelSearch;
-import utils.Search_Item;
-
 
 
 /**
@@ -108,10 +106,15 @@ public class FormQLDonHang extends javax.swing.JPanel {
             });
         }
     }
-    private void refesh(){
+    private void clearText()
+    {
         txtOrderId.setText("");
         txtAccountID.setText("");
         txtVoucherId.setText("");
+        txtSearch.setText("");
+    }
+    private void refesh(){
+        clearText();
         orders=null;
         isShowDetailsEnabled=false;
         getAllOrders();
@@ -222,7 +225,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
     {
         if(isShowDetailsEnabled){
             btnShowDetails.setEnabled(true);
-
+            
         }
         else{
             btnShowDetails.setEnabled(false);
@@ -254,6 +257,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         jLabel12 = new javax.swing.JLabel();
         txtVoucherId = new javax.swing.JTextField();
         cmbSearchType = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
 
         dateStart.setForeground(new java.awt.Color(255, 102, 51));
 
@@ -285,8 +289,8 @@ public class FormQLDonHang extends javax.swing.JPanel {
 
         add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 1080, 440));
 
-        jLabel1.setText("Mã đơn hàng:");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, -1));
+        jLabel1.setText("Trạng thái");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
 
         txtOrderId.setEditable(false);
         add(txtOrderId, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, 200, 30));
@@ -329,7 +333,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 btnShowDetailsActionPerformed(evt);
             }
         });
-        add(btnShowDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 150, 45));
+        add(btnShowDetails, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 120, 150, -1));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -341,7 +345,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 btnRefeshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 170, 150, 45));
+        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 160, 150, 40));
 
         jLabel11.setText("Khách hàng:");
         add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, 30));
@@ -349,7 +353,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         btnUpdate.setBackground(new java.awt.Color(255, 102, 51));
         btnUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnUpdate.setText("Cập nhật");
-        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 170, 150, 45));
+        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 80, 150, -1));
 
         txtAccountID.setEditable(false);
         add(txtAccountID, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 90, 200, 30));
@@ -364,19 +368,22 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 txtSearchKeyReleased(evt);
             }
         });
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 20, 340, -1));
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 16, 320, 30));
 
         cmbOrderStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Đang thực hiện", "Đã hoàn tất" }));
-        add(cmbOrderStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 360, 40));
+        add(cmbOrderStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 140, 200, 30));
 
         jLabel12.setText("Mã ưu đãi:");
-        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 90, -1, 30));
+        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 140, -1, 30));
 
         txtVoucherId.setEditable(false);
-        add(txtVoucherId, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 90, 200, 30));
+        add(txtVoucherId, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 140, 200, 30));
 
         cmbSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tìm theo mã đơn hàng", "Tìm theo SĐT khách hàng" }));
         add(cmbSearchType, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 10, -1, 40));
+
+        jLabel2.setText("Mã đơn hàng:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
@@ -450,6 +457,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;

@@ -13,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -24,11 +26,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import model.Category;
 import model.Voucher;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
-import utils.ImageCellRender;
+import utils.ImageLoader;
 import utils.PanelSearch;
 import utils.table.TableActionCellEditor;
 import utils.table.TableActionCellRender;
@@ -41,6 +44,7 @@ public class FormVoucher extends javax.swing.JPanel {
     private JPopupMenu menu;
     private PanelSearch search;
     private NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private boolean isEditingEnabled = false,isAddEnabled = false;
     private String selectedVoucherType="";
     private int selectedRow=0;
@@ -53,31 +57,49 @@ public class FormVoucher extends javax.swing.JPanel {
         getAllVoucher();
         comboxBoxValueChangeEvent();
         progressLoading.setVisible(false);
+        createSearchTextField();
+    }
+    private void createSearchTextField()
+    {
         menu = new JPopupMenu();
         search = new PanelSearch();
+        
         menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
         menu.add(search);
+
         menu.setFocusable(false);
         search.addEventClick(new EventClick() {
             @Override
             public void itemClick(DataSearch data) {
                 menu.setVisible(false);
                 txtSearch.setText(data.getText());
+                selectedVoucher=vouchers.stream().filter((Voucher voucher) -> voucher.getVoucherID().equals(data.getText())).findFirst().orElse(null);
+                if(selectedVoucher!=null)
+                {
+                    isEditingEnabled=true;
+                    enableEdit();
+                    vouchers.removeIf(voucher -> !voucher.getVoucherID().equals(data.getText()));
+                    loadVoucherTable();
+                    fillTextField(selectedVoucher);
+                }
                 
-                System.out.println("Click Item : " + data.getText());
             }
 
             @Override
             public void itemRemove(Component com, DataSearch data) {
-                search.remove(com);
-                removeHistory(data.getText());
-                menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-                if (search.getItemSize() == 0) {
-                    menu.setVisible(false);
-                }
-                System.out.println("Remove Item : " + data.getText());
+             
             }
         });
+    }
+    private void fillTextField(Voucher voucher){
+        txtVoucherName.setText(voucher.getVoucherName());
+        
+        txtDiscountAmount.setText(voucher.getDiscountAmount() != null ? String.valueOf(voucher.getDiscountAmount()) :"0.0");
+        txtDiscountPercent.setText(voucher.getDiscountPercent() != null ? String.valueOf(voucher.getDiscountPercent()) :"0");
+        txtPointsRequired.setText(voucher.getPointRequired() != null ? String.valueOf(voucher.getPointRequired()) :"0");
+        
+        txtDateBegin.setText(sdf.format(voucher.getStartDate()));
+        txtDateExpired.setText(sdf.format(voucher.getExpDate()));
     }
     private void createTableLastColumnCellEvent(){
          TableActionEvent event = new TableActionEvent() {
@@ -123,13 +145,18 @@ public class FormVoucher extends javax.swing.JPanel {
             });
         }
     }
-    private void refresh(){
+    private void clearInput()
+    {
         txtVoucherName.setText("");
         txtPointsRequired.setText("");
         txtDiscountAmount.setText("");
         txtDiscountPercent.setText("");
         txtDateBegin.setText("");
         txtDateExpired.setText("");
+        txtSearch.setText("");
+    }
+    private void refresh(){
+        
         txtVoucherName.setEditable(false);
         txtPointsRequired.setEditable(false);
         txtDiscountAmount.setEditable(false);
@@ -138,7 +165,8 @@ public class FormVoucher extends javax.swing.JPanel {
         txtDateExpired.setEditable(false);
         btnSave.setVisible(false);
         btnUpdate.setVisible(false);
-        btnAdd.setVisible(false);
+        btnAdd.setVisible(true);
+//        btnAdd.setVisible(false);
 //        dateExpired.setSelectedDate(null);
 //        dateStart.setSelectedDate(null);
         vouchers=null;
@@ -175,7 +203,7 @@ public class FormVoucher extends javax.swing.JPanel {
         if (!vouchers.isEmpty()) {
                 DefaultTableModel model = (DefaultTableModel) tbVoucher.getModel();
                 model.setRowCount(0);
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                
 
                 for (Voucher voucher : vouchers) {
                   
@@ -200,65 +228,6 @@ public class FormVoucher extends javax.swing.JPanel {
         }
     }
 
-
-    private List<DataSearch> search(String search) {
-        int limitData = 7;
-        List<DataSearch> list = new ArrayList<>();
-        String dataTesting[] = {"300 - Rise of an Empire",
-            "Cosmic Sin",
-            "Deadlock",
-            "Deliver Us from Eva",
-            "Empire of the Ants",
-            "Empire of the Sun",
-            "Empire Records",
-            "Empire State",
-            "Four Good Days",
-            "Frozen Fever",
-            "Frozen",
-            "The Courier",
-            "The First Purge",
-            "To Olivia",
-            "Underworld"};
-        for (String d : dataTesting) {
-            if (d.toLowerCase().contains(search)) {
-                boolean story = isStory(d);
-                if (story) {
-//                    list.add(0, new DataSearch(d, story));
-                    //  add or insert to first record
-                } else {
-//                    list.add(new DataSearch(d, story));
-                    //  add to last record
-                }
-                if (list.size() == limitData) {
-                    break;
-                }
-            }
-        }
-        return list;
-    }
-    String dataStory[] = {"300 - Rise of an Empire",
-        "Empire Records",
-        "Empire State",
-        "Frozen",
-        "The Courier"};
-
-    private void removeHistory(String text) {
-        for (int i = 0; i < dataStory.length; i++) {
-            String d = dataStory[i];
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                dataStory[i] = "";
-            }
-        }
-    }
-
-    private boolean isStory(String text) {
-        for (String d : dataStory) {
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
     private void enableEdit()
     {
         if(isAddEnabled)
@@ -266,11 +235,14 @@ public class FormVoucher extends javax.swing.JPanel {
             btnUpdate.setVisible(false);
             btnSave.setVisible(true);
             btnSave.setEnabled(true);
+            
             txtPointsRequired.setEditable(true);
             txtVoucherName.setEditable(true);
             checkComboxBoxIndex();
             txtDateBegin.setEditable(true);
             txtDateExpired.setEditable(true);
+            clearInput();
+            
         }
         else if(isEditingEnabled){
             btnUpdate.setVisible(true);
@@ -281,7 +253,7 @@ public class FormVoucher extends javax.swing.JPanel {
             txtVoucherName.setEditable(true);
             checkComboxBoxIndex();
             txtDateBegin.setEditable(true);
-             txtDateExpired.setEditable(true);
+            txtDateExpired.setEditable(true);
         }
         else{
             btnSave.setEnabled(false);
@@ -384,6 +356,7 @@ public class FormVoucher extends javax.swing.JPanel {
         btnAdd = new utils.Button();
         txtPointsRequired = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
 
         dateStart.setForeground(new java.awt.Color(255, 102, 51));
         dateStart.setTextField(txtDateBegin);
@@ -506,7 +479,18 @@ public class FormVoucher extends javax.swing.JPanel {
 
         txtVoucherName.setEditable(false);
         add(txtVoucherName, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 90, 360, 30));
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 20, 400, -1));
+
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 20, 250, 30));
 
         jLabel12.setText("Phần trăm giảm:");
         add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 250, -1, -1));
@@ -554,6 +538,9 @@ public class FormVoucher extends javax.swing.JPanel {
 
         jLabel14.setText("Số tiền giảm:");
         add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+
+        jLabel15.setText("Tìm kiếm:");
+        add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 26, 60, 20));
     }// </editor-fold>//GEN-END:initComponents
     
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
@@ -680,6 +667,38 @@ public class FormVoucher extends javax.swing.JPanel {
         isEditingEnabled=false;
         enableEdit();
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        String text = txtSearch.getText().trim().toLowerCase();
+        search.setData(search(text));
+        if (search.getItemSize() > 0) {
+            //  * 2 top and bot border
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
+        } else {
+            menu.setVisible(false);
+        }
+    }//GEN-LAST:event_txtSearchKeyReleased
+    private List<DataSearch> search(String search) {
+        int limitData = 7;
+        List<DataSearch> list = new ArrayList<>();
+        for (Voucher v : vouchers) {
+            if (v.getVoucherID().toLowerCase().contains(search)) 
+            {
+                list.add(0, new DataSearch(v.getVoucherID()));
+                if (list.size() == limitData) 
+                {
+                    break;
+                }
+            }
+        }
+        return list;
+    }
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        if (search.getItemSize() > 0) {
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+        }
+    }//GEN-LAST:event_txtSearchMouseClicked
     
      
 
@@ -698,6 +717,7 @@ public class FormVoucher extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;

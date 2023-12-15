@@ -7,13 +7,12 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon; 
 import javax.swing.JFileChooser;
@@ -23,18 +22,19 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import model.Category;
+import model.Dish;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
 import utils.ImageCellRender;
 import utils.ImageLoader;
+import utils.ImagePreviewLabel;
 import utils.PanelSearch;
 import utils.spinner_progress.SpinnerProgress;
 import utils.table.TableActionCellEditor;
@@ -50,6 +50,8 @@ public class FormCategory extends javax.swing.JPanel {
     private File choosenFile;
     private final CategoryController categoryController;
     private List<Category> categories;
+    private Category selectedCategory;
+    private boolean isEditingEnabled = false,isAddEnabled = false;
     private JPopupMenu menu;
     private PanelSearch search;
     public FormCategory() {
@@ -57,37 +59,16 @@ public class FormCategory extends javax.swing.JPanel {
         categoryController=new CategoryController();
         createTableLastColumnCellEvent();
         getAllCategory();
-        menu = new JPopupMenu();
-        search = new PanelSearch();
-        menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
-        menu.add(search);
-        menu.setFocusable(false);
-        search.addEventClick(new EventClick() {
-            @Override
-            public void itemClick(DataSearch data) {
-                menu.setVisible(false);
-                txtSearch.setText(data.getText());
-                
-                System.out.println("Click Item : " + data.getText());
-            }
-
-            @Override
-            public void itemRemove(Component com, DataSearch data) {
-                search.remove(com);
-                removeHistory(data.getText());
-                menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
-                if (search.getItemSize() == 0) {
-                    menu.setVisible(false);
-                }
-                System.out.println("Remove Item : " + data.getText());
-            }
-        });
+        createSearchTextField();
+        circleProgress.setVisible(false);
     }
     private void createTableLastColumnCellEvent(){
          TableActionEvent event = new TableActionEvent() {
             @Override
             public void onEdit(int row) {
-                System.out.println("Edit row : " + row);
+                isEditingEnabled = true;
+                isAddEnabled=false;
+                enableEdit();
             }
 
             @Override
@@ -98,10 +79,6 @@ public class FormCategory extends javax.swing.JPanel {
                 DefaultTableModel model = (DefaultTableModel) tbCategory.getModel();
                 String categoryId = (String) model.getValueAt(row, 0);
                 deleteCategory(categoryId);
-//                if(deleteCategory(categoryId)){
-//                    model.removeRow(row);
-//                }
-//                model.removeRow(row);
             }
 
             @Override
@@ -119,6 +96,59 @@ public class FormCategory extends javax.swing.JPanel {
             }
         });
     }
+     private void createSearchTextField()
+    {
+        menu = new JPopupMenu();
+        search = new PanelSearch();
+        
+        menu.setBorder(BorderFactory.createLineBorder(new Color(164, 164, 164)));
+        menu.add(search);
+
+        menu.setFocusable(false);
+        search.addEventClick(new EventClick() {
+            @Override
+            public void itemClick(DataSearch data) {
+                menu.setVisible(false);
+                txtSearch.setText(data.getText());
+                selectedCategory=categories.stream().filter((Category category) -> category.getCategoryName().equals(data.getText())).findFirst().orElse(null);
+                if(selectedCategory!=null)
+                {
+                    isEditingEnabled=true;
+                    enableEdit();
+                    categories.removeIf(cate -> !cate.getCategoryName().equals(data.getText()));
+                    loadCategoryTable();
+                    fillTextField(selectedCategory);
+
+                }
+                
+            }
+
+            @Override
+            public void itemRemove(Component com, DataSearch data) {
+             
+            }
+        });
+    }
+    private void fillTextField(Category category){
+        txtCategoryName.setText(category.getCategoryName());
+        txtUrl.setText(category.getCategoryName());
+        ImageLoader loader = new ImageLoader(category.getImageUrl(), lbImage.getWidth(), lbImage.getHeight());
+        loader.execute();
+
+        loader.addPropertyChangeListener(evt -> {
+        if ("state".equals(evt.getPropertyName()) && 
+           SwingWorker.StateValue.DONE == evt.getNewValue()) {
+
+            try {
+                // Set image on EDT thread
+                ImageIcon icon = loader.get();
+                lbImage.setIcon(icon);
+            } catch (InterruptedException | ExecutionException ex) {
+                System.out.println("Image error");
+            }
+        }
+        });                 
+    }
     private void refesh(){
         txtCategoryName.setText("");
         txtUrl.setText("");
@@ -126,6 +156,43 @@ public class FormCategory extends javax.swing.JPanel {
         choosenFile=null;
         categories=null;
         getAllCategory();
+    }
+    private void clearText()
+    {
+        txtCategoryName.setText("");
+        txtUrl.setText("");
+        txtSearch.setText("");
+    }
+    private void enableEdit()
+    {
+        if(isAddEnabled)
+        {
+            lbImage.setIcon(null);
+            btnUpdate.setVisible(false);
+            btnSave.setVisible(true);
+            btnSave.setEnabled(true);
+            btnChooseImage.setEnabled(true);
+            txtCategoryName.setEditable(true);
+
+            clearText();
+        }
+        else if(isEditingEnabled){
+            btnUpdate.setVisible(true);
+            btnUpdate.setEnabled(true);
+            btnSave.setVisible(false);
+            btnChooseImage.setEnabled(true);
+            txtCategoryName.setEditable(true);
+
+        }
+        else{
+            btnSave.setEnabled(false);
+            btnSave.setVisible(false);
+            btnUpdate.setVisible(false);
+            btnUpdate.setEnabled(false);
+            btnChooseImage.setEnabled(false);
+            txtCategoryName.setEditable(false);
+
+        }
     }
      private void getAllCategory(){
         List<Category> categoriesResult=categoryController.getAllCategory();
@@ -220,76 +287,21 @@ public class FormCategory extends javax.swing.JPanel {
     }
 
 
-    private List<DataSearch> search(String search) {
-        int limitData = 7;
-        List<DataSearch> list = new ArrayList<>();
-        String dataTesting[] = {"300 - Rise of an Empire",
-            "Cosmic Sin",
-            "Deadlock",
-            "Deliver Us from Eva",
-            "Empire of the Ants",
-            "Empire of the Sun",
-            "Empire Records",
-            "Empire State",
-            "Four Good Days",
-            "Frozen Fever",
-            "Frozen",
-            "The Courier",
-            "The First Purge",
-            "To Olivia",
-            "Underworld"};
-        for (String d : dataTesting) {
-            if (d.toLowerCase().contains(search)) {
-                boolean story = isStory(d);
-                if (story) {
-//                    list.add(0, new DataSearch(d, story));
-                    //  add or insert to first record
-                } else {
-//                    list.add(new DataSearch(d, story));
-                    //  add to last record
-                }
-                if (list.size() == limitData) {
-                    break;
-                }
-            }
-        }
-        return list;
-    }
-    String dataStory[] = {"300 - Rise of an Empire",
-        "Empire Records",
-        "Empire State",
-        "Frozen",
-        "The Courier"};
-
-    private void removeHistory(String text) {
-        for (int i = 0; i < dataStory.length; i++) {
-            String d = dataStory[i];
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                dataStory[i] = "";
-            }
-        }
-    }
-
-    private boolean isStory(String text) {
-        for (String d : dataStory) {
-            if (d.toLowerCase().equals(text.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     private void createTableRowClick(){
         tbCategory.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
 
                 int selectedRow = tbCategory.getSelectedRow();
-                if(selectedRow < 0 || selectedRow == 6)
+                int modelRowIndex = tbCategory.convertRowIndexToModel(selectedRow);
+                if(modelRowIndex < 0 || modelRowIndex == 6)
                     return;
-                if (selectedRow >= 0) {
+                if (modelRowIndex >= 0) {
+                    isAddEnabled=false;
+                    isEditingEnabled=false;
+                    enableEdit();
                     try {
-                        Category selectedCategory = categories.get(selectedRow);
+                        selectedCategory = categories.get(modelRowIndex);
                         txtCategoryName.setText(selectedCategory.getCategoryName());
                         txtUrl.setText(selectedCategory.getImageUrl());
 
@@ -348,11 +360,15 @@ public class FormCategory extends javax.swing.JPanel {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         lbExit1 = new javax.swing.JLabel();
-        btnLuu = new utils.Button();
+        btnSave = new utils.Button();
         btnChooseImage = new utils.Button();
         btnRefesh = new utils.Button();
         jLabel5 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
+        btnUpdate = new utils.Button();
+        btnAdd = new utils.Button();
+        circleProgress = new utils.spinner_progress.SpinnerProgress();
+        jLabel6 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1366, 768));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -396,8 +412,8 @@ public class FormCategory extends javax.swing.JPanel {
         });
         add(txtUrl, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, 355, 34));
 
-        jLabel2.setText("Ảnh danh mục:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 90, -1, -1));
+        jLabel2.setText("Tìm kiếm:");
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 30, 60, -1));
 
         pnImage.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
@@ -436,17 +452,17 @@ public class FormCategory extends javax.swing.JPanel {
         });
         add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 10, -1, -1));
 
-        btnLuu.setBackground(new java.awt.Color(30, 180, 114));
-        btnLuu.setForeground(new java.awt.Color(245, 245, 245));
-        btnLuu.setText("Lưu");
-        btnLuu.setRippleColor(new java.awt.Color(255, 255, 255));
-        btnLuu.setShadowColor(new java.awt.Color(30, 180, 114));
-        btnLuu.addActionListener(new java.awt.event.ActionListener() {
+        btnSave.setBackground(new java.awt.Color(30, 180, 114));
+        btnSave.setForeground(new java.awt.Color(245, 245, 245));
+        btnSave.setText("Lưu");
+        btnSave.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnSave.setShadowColor(new java.awt.Color(30, 180, 114));
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLuuActionPerformed(evt);
+                btnSaveActionPerformed(evt);
             }
         });
-        add(btnLuu, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 90, 140, -1));
+        add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 80, 140, -1));
 
         btnChooseImage.setBackground(new java.awt.Color(253, 83, 83));
         btnChooseImage.setForeground(new java.awt.Color(245, 245, 245));
@@ -458,7 +474,7 @@ public class FormCategory extends javax.swing.JPanel {
                 btnChooseImageActionPerformed(evt);
             }
         });
-        add(btnChooseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 150, 140, -1));
+        add(btnChooseImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 120, 140, -1));
 
         btnRefesh.setBackground(new java.awt.Color(29, 162, 253));
         btnRefesh.setForeground(new java.awt.Color(245, 245, 245));
@@ -470,48 +486,108 @@ public class FormCategory extends javax.swing.JPanel {
                 btnRefeshActionPerformed(evt);
             }
         });
-        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 210, 140, -1));
+        add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 160, 140, -1));
 
         jLabel5.setText("Đường dẫn");
         add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
-        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 230, -1));
+
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
+        add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 20, 300, 30));
+
+        btnUpdate.setBackground(new java.awt.Color(30, 180, 114));
+        btnUpdate.setForeground(new java.awt.Color(245, 245, 245));
+        btnUpdate.setText("Cập nhật");
+        btnUpdate.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnUpdate.setShadowColor(new java.awt.Color(30, 180, 114));
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
+        add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 80, 140, -1));
+
+        btnAdd.setBackground(new java.awt.Color(30, 180, 114));
+        btnAdd.setForeground(new java.awt.Color(245, 245, 245));
+        btnAdd.setText("+ Thêm danh mục");
+        btnAdd.setRippleColor(new java.awt.Color(255, 255, 255));
+        btnAdd.setShadowColor(new java.awt.Color(30, 180, 114));
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+        add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 230, 140, -1));
+
+        circleProgress.setForeground(new java.awt.Color(255, 153, 51));
+        circleProgress.setIndeterminate(true);
+        add(circleProgress, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 80, 40, 40));
+
+        jLabel6.setText("Ảnh danh mục:");
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 90, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUrlActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtUrlActionPerformed
-    private void setFileChooseUI(){
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(this.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
         System.exit(0);
     }//GEN-LAST:event_lbExit1MouseClicked
 
-    private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
-        String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
-        if(response.equals("Success")){
-            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
-            refesh();   
-        }
-        else{
-             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Thêm danh mục thất bại!");
-        }
-    }//GEN-LAST:event_btnLuuActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        
+        circleProgress.setVisible(true);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                String response = categoryController.createCategory(txtCategoryName.getText(),choosenFile);
+                if(response.equals("Success")){
+                    Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Thêm danh mục thành công!");
+                    refesh();   
+                }
+                else{
+                     Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Thêm danh mục thất bại!");
+                }
+                return null;
+            }
+            @Override
+            protected void done() {
+                circleProgress.setVisible(false);
+            }
+        };
+        worker.execute();
+    }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
-          setFileChooseUI();
-        JFileChooser fileChooser = new JFileChooser();
-        int returnValue = fileChooser.showOpenDialog(null); // Open a file chooser dialog
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "Images", "jpg", "jpeg", "png");
+        chooser.setFileFilter(filter);
+        ImagePreviewLabel imagePreview = new ImagePreviewLabel();
+            chooser.setAccessory(imagePreview); 
+
+            chooser.addPropertyChangeListener((PropertyChangeEvent evt1) -> {
+                if (evt1.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
+                    File f = (File) evt1.getNewValue();
+                    imagePreview.setImage(f);
+                }
+        });
+        
+        int returnValue = chooser.showOpenDialog(this); 
 
         if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+            File selectedFile = chooser.getSelectedFile();
             String filePath = selectedFile.getAbsolutePath();
             choosenFile=selectedFile;
-            // Load the selected image and set it in the label
             ImageIcon imageIcon = new ImageIcon(filePath);
             Image scaledImage = imageIcon.getImage().getScaledInstance(lbImage.getWidth(), lbImage.getHeight(), Image.SCALE_SMOOTH);
             
@@ -524,17 +600,91 @@ public class FormCategory extends javax.swing.JPanel {
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
-    
+    private void updateCategory()
+    {
+        if(selectedCategory!=null)
+        {
+            Category updatedCategory=selectedCategory;
+            updatedCategory.setCategoryName(txtCategoryName.getText());
+            String result=categoryController.updateCategory(choosenFile,updatedCategory);
+            
+            if(result.equals("Success")){
+                Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Cập nhật món thành công!");
+                refesh(); 
+            }
+            else{
+                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+            }
+        }
+    }
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        circleProgress.setVisible(true);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                updateCategory();
+                return null;
+            }
+            @Override
+            protected void done() {
+                circleProgress.setVisible(false);
+            }
+        };
+        worker.execute();
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        isAddEnabled=true;
+        isEditingEnabled=false;
+        enableEdit();
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        String text = txtSearch.getText().trim().toLowerCase();
+        search.setData(search(text));
+        if (search.getItemSize() > 0) {
+            //  * 2 top and bot border
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+            menu.setPopupSize(menu.getWidth(), (search.getItemSize() * 35) + 2);
+        } else {
+            menu.setVisible(false);
+        }
+    }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        if (search.getItemSize() > 0) {
+            menu.show(txtSearch, 0, txtSearch.getHeight());
+        }
+    }//GEN-LAST:event_txtSearchMouseClicked
+    private List<DataSearch> search(String search) {
+        int limitData = 7;
+        List<DataSearch> list = new ArrayList<>();
+        for (Category c : categories) {
+            if (c.getCategoryName().toLowerCase().contains(search)) 
+            {
+                list.add(0, new DataSearch(c.getCategoryName()));
+                if (list.size() == limitData) 
+                {
+                    break;
+                }
+            }
+        }
+        return list;
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private utils.Button btnAdd;
     private utils.Button btnChooseImage;
-    private utils.Button btnLuu;
     private utils.Button btnRefesh;
+    private utils.Button btnSave;
+    private utils.Button btnUpdate;
+    private utils.spinner_progress.SpinnerProgress circleProgress;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;

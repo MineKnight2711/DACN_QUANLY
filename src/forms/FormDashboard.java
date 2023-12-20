@@ -1,63 +1,131 @@
 package forms;
 
-import com.formdev.flatlaf.FlatClientProperties;
-import raven.toast.Notifications;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.font.TextAttribute;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.text.StyleContext;
+
 
 /**
  *
  * @author Raven
  */
 public class FormDashboard extends javax.swing.JPanel {
+    private Image backgroundImage;
 
     public FormDashboard() {
-        initComponents();
+        setLayout(new BorderLayout());
+
+        // Load the background image
+        backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
+
+        // Create a panel for the background image
+        JPanel backgroundPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        backgroundPanel.setLayout(new BorderLayout());
+
+        add(backgroundPanel, BorderLayout.CENTER);
+
+        addLabel(backgroundPanel);
+        addCloseButton(backgroundPanel);
     }
+
+    private void addLabel(JPanel backgroundPanel) {
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
+        labelsPanel.setOpaque(false);
+
+        JLabel welcomeLabel = new JLabel("Chào mừng trở lại, Staff name!");
+        JLabel wishLabel = new JLabel("Chúc 1 ngày làm việc tốt lành.");
+
+        // Set font styles if needed
+        Font segoeScriptFont = createFont("Segoe Script",Font.PLAIN,24);
+
+
+        welcomeLabel.setFont(segoeScriptFont);
+        wishLabel.setFont(segoeScriptFont);
+        welcomeLabel.setForeground(Color.YELLOW);
+        wishLabel.setForeground(Color.YELLOW);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        wishLabel.setAlignmentX(Component.CENTER_ALIGNMENT-Float.parseFloat("0.2"));
+        // Add welcomeLabel to the NORTH of labelsPanel
+        labelsPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+        labelsPanel.add(welcomeLabel);
+        labelsPanel.add(wishLabel);
+
+        // Add labelsPanel to backgroundPanel at the CENTER
+        backgroundPanel.add(labelsPanel, BorderLayout.CENTER);
+    }
+    
+    private void addCloseButton(JPanel backgroundPanel) {
+        JButton closeButton = new JButton("X");
+        closeButton.addActionListener((ActionEvent e) -> {
+            System.exit(0);
+        });
+
+        JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonWrapper.setOpaque(false); // Make the panel transparent
+        buttonWrapper.add(closeButton);
+
+        // Add the button panel to the main panel at the NORTH position
+        backgroundPanel.add(buttonWrapper, BorderLayout.NORTH);
+    }
+    private Font createFont( String family, int style,  int size) {
+        return new NonUIResourceFont(StyleContext.getDefaultStyleContext().getFont(family, style, size));
+    }
+
+    class NonUIResourceFont extends Font {
+
+        public NonUIResourceFont(final Font font) {
+            super(font);
+        }
+    }
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lbExit = new javax.swing.JLabel();
-        lbExit1 = new javax.swing.JLabel();
-
         setPreferredSize(new java.awt.Dimension(1366, 768));
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbExit.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lbExit.setForeground(new java.awt.Color(153, 153, 153));
-        lbExit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbExit.setText("X");
-        lbExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        lbExit.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lbExitMouseClicked(evt);
-            }
-        });
-        add(lbExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(1326, 0, 40, 29));
-
-        lbExit1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lbExit1.setForeground(new java.awt.Color(153, 153, 153));
-        lbExit1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbExit1.setText("X");
-        lbExit1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        lbExit1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lbExit1MouseClicked(evt);
-            }
-        });
-        add(lbExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 10, 30, -1));
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1366, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 768, Short.MAX_VALUE)
+        );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void lbExitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExitMouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_lbExitMouseClicked
-
-    private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
-        System.exit(0);
-    }//GEN-LAST:event_lbExit1MouseClicked
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lbExit;
-    private javax.swing.JLabel lbExit1;
     // End of variables declaration//GEN-END:variables
 }

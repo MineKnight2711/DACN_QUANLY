@@ -4,13 +4,21 @@
  */
 package api;
 
+import static api.BaseURL.BASE_URL;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 /**
  *
@@ -38,48 +46,38 @@ public class AccountAPI {
         return response.toString();
     }
     
-    public String signIn(String email,String password){
-        StringBuilder response = new StringBuilder();
-        try {
-            
-            URL url = new URL(BaseURL.BASE_URL+BaseURL.SIGN_IN_API);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    public String signIn(String email,String password)
+    {
+        try 
+        {
+            HttpURLConnection conn = (HttpURLConnection) new URL(BASE_URL + "account/sign-in").openConnection();    
+            conn.setRequestMethod("POST");
 
-            // Set the request method to POST
-            connection.setRequestMethod("POST");
+            String body = String.format("email=%s&password=%s", 
+                    URLEncoder.encode(email, StandardCharsets.UTF_8.toString()),  
+                    URLEncoder.encode(password, StandardCharsets.UTF_8.toString()));
 
-            // Enable input and output streams
-            connection.setDoOutput(true);
-
-            // Set request headers if needed
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            // Construct the JSON request body
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("email", email);
-            jsonRequest.addProperty("password", password);
-            // Cho phép trả về token đăng nhập 
-            jsonRequest.addProperty("returnSecureToken", true);
-            
-
-            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                out.writeBytes(jsonRequest.toString());
-                out.flush();
+            conn.setDoOutput(true);
+            try(var os = conn.getOutputStream()) {
+                os.write(body.getBytes());
             }
-            
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
+
+            // Send request  
+            int status = conn.getResponseCode();
+
+
+            String response = ""; 
+            if (status ==  200) {
+                try (Scanner scanner = new Scanner(conn.getInputStream())) {
+                    response = scanner.useDelimiter("\\A").next();
                 }
+                return response;
             }
-                
-
-            connection.disconnect();
-        } catch (IOException e) {
+            return "Fail";
+        } catch (Exception e) 
+        {
             e.printStackTrace();
             return "Fail";
-        }
-        return response.toString();
+        } 
     }
 }

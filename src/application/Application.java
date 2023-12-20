@@ -3,7 +3,6 @@ package application;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,7 +17,6 @@ public class Application extends javax.swing.JFrame {
     private static Application app;
     private final MainForm mainForm;
     private final LoginForm loginForm;
-//    private final LoginForm1 loginForm1;
 
     public Application() {
         initComponents();
@@ -26,8 +24,9 @@ public class Application extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         mainForm = new MainForm();
         loginForm = new LoginForm();
-//        loginForm1=new LoginForm1();
+
         setContentPane(mainForm);
+        
         Notifications.getInstance().setJFrame(this);
     }
 

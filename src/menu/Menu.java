@@ -11,7 +11,6 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -25,14 +24,10 @@ import menu.mode.ToolBarAccentColor;
 public class Menu extends JPanel {
 
     private final String menuItems[][] = {
-        {"~MAIN~"},
+        {"~MENU Quản lý~"},
         {"Dashboard"},
-        {"~WEB APP~"},
         {"QUẢN LÝ", "Nhân viên", "Danh mục","Món ăn", "Đơn hàng", "Voucher"},
-        {"Chats"},
-        {"~OTHER~"},
         {"THỐNG KÊ", "Doanh thu", "Đơn hàng"},
-     
         {"Logout"}
     };
 

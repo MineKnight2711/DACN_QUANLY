@@ -28,10 +28,9 @@ public class AccountController {
             ResponseModel responeModel=jsonHandle.getResponseFromJson(signInResult);
             String loginResponseJson=responeModel.getData().toString();
             if(!loginResponseJson.contains("error")){
-                LoginResponse loginResponse=jsonHandle.getLoginResponseFromJson(responeModel.getData().toString());
+                LoginResponse loginResponse=jsonHandle.getLoginResponseFromJson(loginResponseJson);
                 String accountresult= accountAPI.getAccountByEmail(loginResponse.getEmail());
                 ResponseModel accountResponseModel=jsonHandle.getResponseFromJson(accountresult);
-                System.out.println("Account "+accountResponseModel.getData().toString());
                 return accountResponseModel.getMessage();
             }
             return responeModel.getMessage();

@@ -13,9 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -280,7 +278,7 @@ public class FormVoucher extends javax.swing.JPanel {
                     isAddEnabled=false;
                     isEditingEnabled=false;
                     enableEdit();
-                    selectedVoucher = vouchers.get(selectedRow);
+                    selectedVoucher = vouchers.get(modelRowIndex);
                     txtVoucherName.setText(selectedVoucher.getVoucherName());
                     txtPointsRequired.setText(String.valueOf(selectedVoucher.getPointRequired()));
                     txtDiscountPercent.setText(String.valueOf(selectedVoucher.getDiscountPercent()));

@@ -28,7 +28,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import model.Category;
-import model.Dish;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;

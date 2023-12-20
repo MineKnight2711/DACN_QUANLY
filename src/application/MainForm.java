@@ -21,21 +21,26 @@ import forms.FormCategory;
 import forms.FormDish;
 import forms.FormQLDonHang;
 import forms.FormVoucher;
+import forms.HomePanel;
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import menu.Menu;
 import menu.MenuAction;
 
 
 public class MainForm extends JLayeredPane {
-
+    private Image backgroundImage;
     public MainForm() {
+        backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
         init();
     }
-
     private void init() {
         setBorder(new EmptyBorder(5, 5, 5, 5));
         setLayout(new MainFormLayout());
         menu = new Menu();
-        panelBody = new JPanel(new BorderLayout());
+        
+        panelBody = new FormDashboard();
         initMenuArrowIcon();
         menuButton.putClientProperty(FlatClientProperties.STYLE, ""
                 + "background:$Menu.button.background;"
@@ -50,6 +55,7 @@ public class MainForm extends JLayeredPane {
         add(menuButton);
         add(menu);
         add(panelBody);
+        
     }
 
     @Override
@@ -68,13 +74,19 @@ public class MainForm extends JLayeredPane {
 
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-            // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " + subIndex));
             if (index == 0) {
                 Application.showForm(new FormDashboard());
             } else if (index == 1) {
                 if (subIndex == 1) {
                     Application.showForm(new FormQuanLyNhanVien());
                 } else if (subIndex == 2) {
+//                    final FormCategory frmCategory=new FormCategory(){
+//                        @Override
+//                        protected void paintComponent(Graphics g) {
+//                            super.paintComponent(g);
+//                            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+//                        }
+//                    };
                     Application.showForm(new FormCategory());
                 } else if(subIndex==3){
                      Application.showForm(new FormDish());
@@ -89,11 +101,9 @@ public class MainForm extends JLayeredPane {
                 else {
                     action.cancel();
                 }
-            } else if (index == 9) {
+            } else if (index == 3) {
                 Application.logout();
-            } else {
-                action.cancel();
-            }
+            } 
         });
     }
 

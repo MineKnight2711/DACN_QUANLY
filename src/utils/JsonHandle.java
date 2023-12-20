@@ -21,8 +21,14 @@ import model.Voucher;
  */
 public class JsonHandle {
     private final Gson gson;
+    private final Gson prettyJson;
     public JsonHandle() {
         gson=new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+        prettyJson=new GsonBuilder().setPrettyPrinting().create();
+    }
+    public String toPrettyJson(Object object)
+    {
+        return prettyJson.toJson(object);
     }
     public String toJson(Object object)
     {
@@ -32,8 +38,7 @@ public class JsonHandle {
         return gson.fromJson(responeJson, ResponseModel.class);
     }
     public LoginResponse getLoginResponseFromJson(String loginResponeJson){
-        String uncappedJson=gson.fromJson(loginResponeJson, String.class);
-        return gson.fromJson(uncappedJson, LoginResponse.class);
+        return gson.fromJson(loginResponeJson, LoginResponse.class);
     }
     public List<Category> getListCategoryFromJson(String listJson){
         return gson.fromJson(listJson, new TypeToken<List<Category>>() {}.getType());

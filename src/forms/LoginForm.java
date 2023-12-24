@@ -2,7 +2,10 @@ package forms;
 
 import controller.AccountController;
 import application.Application;
+import model.AccountSession;
+import model.ResponseModel;
 import raven.toast.Notifications;
+import utils.JsonHandle;
 
 /**
  *
@@ -10,8 +13,11 @@ import raven.toast.Notifications;
  */
 public class LoginForm extends javax.swing.JPanel {
     private AccountController accountController;
+    private JsonHandle jsonHandle;
+
     public LoginForm() {
         initComponents();
+        jsonHandle=new JsonHandle();
         accountController=new AccountController();
    
 //        init();
@@ -203,10 +209,14 @@ public class LoginForm extends javax.swing.JPanel {
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         
-        String result=accountController.signIn(txtEmail.getText(),new String(txtPass.getPassword()));
-        if(result.equals("Success")){
+        ResponseModel result=accountController.signIn(txtEmail.getText(),new String(txtPass.getPassword()));
+        
+        if(result.getMessage().equals("Success")){
             Notifications.getInstance().show(Notifications.Type.INFO, Notifications.Location.TOP_CENTER, "Đăng nhập thành công");
-            Application.login();
+            AccountSession accSession=new AccountSession();
+            accSession.setLoggedInAccount(jsonHandle.getAccountFromJson(result.getData().toString()));
+            accSession.setIsLoggedIn(true);
+            Application.login(accSession);
         }
         else{
             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Đăng nhập thất bại");

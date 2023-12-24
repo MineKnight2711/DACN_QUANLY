@@ -3,7 +3,6 @@ package application;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.util.UIScale;
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -21,17 +20,18 @@ import forms.FormCategory;
 import forms.FormDish;
 import forms.FormQLDonHang;
 import forms.FormVoucher;
-import forms.HomePanel;
-import java.awt.Graphics;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import menu.Menu;
 import menu.MenuAction;
+import model.AccountSession;
 
 
 public class MainForm extends JLayeredPane {
+    private  AccountSession currentAccount;
     private Image backgroundImage;
-    public MainForm() {
+    public MainForm(AccountSession account) {
+        this.currentAccount=account;
         backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
         init();
     }
@@ -40,7 +40,7 @@ public class MainForm extends JLayeredPane {
         setLayout(new MainFormLayout());
         menu = new Menu();
         
-        panelBody = new FormDashboard();
+        panelBody = new FormDashboard(currentAccount);
         initMenuArrowIcon();
         menuButton.putClientProperty(FlatClientProperties.STYLE, ""
                 + "background:$Menu.button.background;"
@@ -75,7 +75,7 @@ public class MainForm extends JLayeredPane {
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
             if (index == 0) {
-                Application.showForm(new FormDashboard());
+                Application.showForm(new FormDashboard(currentAccount));
             } else if (index == 1) {
                 if (subIndex == 1) {
                     Application.showForm(new FormQuanLyNhanVien());
@@ -102,6 +102,7 @@ public class MainForm extends JLayeredPane {
                     action.cancel();
                 }
             } else if (index == 3) {
+                this.currentAccount=null;
                 Application.logout();
             } 
         });

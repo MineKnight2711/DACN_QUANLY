@@ -8,7 +8,6 @@ import api.OrderApi;
 import java.util.List;
 import model.OrderDTO;
 import model.ResponseModel;
-import model.Voucher;
 import utils.JsonHandle;
 
 /**
@@ -33,5 +32,13 @@ public class OrderController
             return jsonHandle.getOrdersFromResponseModel(responseModel.getData().toString());
         }
         return null;
+    }
+    public String updateOrder(String orderId,String orderStatus){
+        ResponseModel apiResult=orderApi.updateOrder(orderId,orderStatus);
+        if(apiResult.getMessage().equals("Success"))
+        {
+            return "Success";
+        }
+        return apiResult.getData().toString();
     }
 }

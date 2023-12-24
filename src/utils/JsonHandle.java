@@ -8,7 +8,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.util.List;
+import model.Account;
 import model.Category;
+import model.DeliveryResponse;
 import model.Dish;
 import model.LoginResponse;
 import model.OrderDTO;
@@ -40,6 +42,12 @@ public class JsonHandle {
     public LoginResponse getLoginResponseFromJson(String loginResponeJson){
         return gson.fromJson(loginResponeJson, LoginResponse.class);
     }
+    public Account getAccountFromJson(String accountJson){
+        return gson.fromJson(accountJson, Account.class);
+    }
+    public List<Account> getAllAdminFromJson(String accountJson){
+        return gson.fromJson(accountJson, new TypeToken<List<Account>>() {}.getType());
+    }
     public List<Category> getListCategoryFromJson(String listJson){
         return gson.fromJson(listJson, new TypeToken<List<Category>>() {}.getType());
     }
@@ -52,5 +60,9 @@ public class JsonHandle {
     }
     public List<OrderDTO> getOrdersFromResponseModel(String listJson) {
         return gson.fromJson(listJson, new TypeToken<List<OrderDTO>>() {}.getType());
+    }
+
+    public List<DeliveryResponse> getDeliveryResponseFromJson(String deliveryJson) {
+        return gson.fromJson(deliveryJson, new TypeToken<List<DeliveryResponse>>() {}.getType());
     }
 }

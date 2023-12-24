@@ -1,11 +1,15 @@
 package forms;
 
 
+import controller.AccountController;
+import controller.DeliveryController;
 import controller.OrderController;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +18,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import model.OrderDTO;
+import model.OrderStatus;
+import model.ResponseModel;
 import raven.toast.Notifications;
 import utils.DataSearch;
 import utils.EventClick;
@@ -30,6 +37,8 @@ import utils.PanelSearch;
  */
 public class FormQLDonHang extends javax.swing.JPanel {
     private final OrderController orderController;
+    private final AccountController accountController;
+    private final DeliveryController deliveryController;
     private List<OrderDTO> orders;
     private OrderDTO selectedOrder;
     private boolean isShowDetailsEnabled=false;
@@ -37,13 +46,21 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private PanelSearch search;
     public FormQLDonHang() {
         initComponents();
-      
+        progressLoading.setVisible(false);
+        loadComboxBox();
         orderController=new OrderController();
+        accountController=new AccountController();
+        deliveryController=new DeliveryController();
         createTableLastColumnCellEvent();
         getAllOrders();
         createSearchTextField();
     }
-    
+    private void loadComboxBox()
+    {
+        cmbOrderStatus.addItem(OrderStatus.STATUS_PROCESING);
+        cmbOrderStatus.addItem(OrderStatus.STATUS_COMPLETE); 
+        cmbOrderStatus.addItem(OrderStatus.STATUS_CANCEL);
+    }
     private void createSearchTextField()
     {
         menu = new JPopupMenu();
@@ -117,6 +134,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
         clearText();
         orders=null;
         isShowDetailsEnabled=false;
+        enableEdit();
         getAllOrders();
     }
      private void getAllOrders(){
@@ -141,6 +159,19 @@ public class FormQLDonHang extends javax.swing.JPanel {
 //            return false;
 //        }
 //    }
+    private boolean updateOrder(){
+        
+        String result=orderController.updateOrder(selectedOrder.getOrder().getOrderID(),cmbOrderStatus.getSelectedItem().toString());
+        if(result.equals("Success")){
+            Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Cập nhật đơn hàng thành công!");
+            refesh(); 
+            return true;
+        }
+        else{
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+            return false;
+        }
+    }
     private void loadOrdersTable() {
         if (!orders.isEmpty()) {
                 DefaultTableModel model = (DefaultTableModel) tbOrder.getModel();
@@ -150,18 +181,19 @@ public class FormQLDonHang extends javax.swing.JPanel {
                   
                     String orderId = details.getOrder().getOrderID();
                     String status = details.getOrder().getStatus();
-                    String deliveryInfo = details.getOrder().getDeliveryInfo();
+                    String paymentMethod=details.getPaymentMethod();
                     String quantity = String.valueOf(details.getOrder().getQuantity());
                     String score = details.getOrder().getScore() != null ? String.valueOf(details.getOrder().getScore()) : "Chưa đánh giá";
                     String feedBack =  details.getOrder().getScore() != null ? details.getOrder().getFeedBack() : "Chưa đánh giá";
                     String dateFeedBack=details.getOrder().getDateFeedBack() != null ? sdf.format(details.getOrder().getDateFeedBack()): "Chưa đánh giá";
                     String voucherName=details.getOrder().getVoucher()!= null ? details.getOrder().getVoucher().getVoucherName() : "Không có";
+                    String deliveryInfo = details.getOrder().getDeliveryInfo();
                     String accountPhoneNumber=details.getOrder().getAccount().getPhoneNumber();
                     String dateOrder=sdf.format(details.getOrder().getOrderDate());
 //                    Double discountAmountReceived=voucher.getDiscountAmount() != null ? voucher.getDiscountAmount() : 0.0;        
 //                    String discountAmount =fmt.format(discountAmountReceived);
                     
-                    model.addRow(new Object[]{orderId, status, deliveryInfo,quantity,score,feedBack,dateFeedBack,voucherName,accountPhoneNumber,dateOrder});
+                    model.addRow(new Object[]{orderId, status,paymentMethod,quantity,score,feedBack,dateFeedBack,voucherName, deliveryInfo,accountPhoneNumber,dateOrder});
                 }
                 createTableRowClick();
                 tbOrder.setRowSorter(new TableRowSorter<>(model));
@@ -171,31 +203,6 @@ public class FormQLDonHang extends javax.swing.JPanel {
         }
     }
 
-
-    
-//    String dataStory[] = {"300 - Rise of an Empire",
-//        "Empire Records",
-//        "Empire State",
-//        "Frozen",
-//        "The Courier"};
-
-//    private void removeHistory(String text) {
-//        for (int i = 0; i < dataStory.length; i++) {
-//            String d = dataStory[i];
-//            if (d.toLowerCase().equals(text.toLowerCase())) {
-//                dataStory[i] = "";
-//            }
-//        }
-//    }
-
-//    private boolean isStory(String text) {
-//        for (String d : dataStory) {
-//            if (d.toLowerCase().equals(text.toLowerCase())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
     
     private void createTableRowClick(){
         tbOrder.addMouseListener(new MouseAdapter(){
@@ -204,7 +211,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 
                 int selectedRow = tbOrder.getSelectedRow();
                 int modelRowIndex = tbOrder.convertRowIndexToModel(selectedRow);
-                if(modelRowIndex < 0 || modelRowIndex == 10)
+                if(modelRowIndex < 0 || modelRowIndex == 11)
                     return;
                 if (modelRowIndex >= 0) {
                     isShowDetailsEnabled=true;
@@ -225,10 +232,11 @@ public class FormQLDonHang extends javax.swing.JPanel {
     {
         if(isShowDetailsEnabled){
             btnShowDetails.setEnabled(true);
-            
+            btnUpdate.setEnabled(true);
         }
         else{
             btnShowDetails.setEnabled(false);
+            btnUpdate.setEnabled(false);
         }
     }
 
@@ -258,6 +266,8 @@ public class FormQLDonHang extends javax.swing.JPanel {
         txtVoucherId = new javax.swing.JTextField();
         cmbSearchType = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
+        progressLoading = new utils.spinner_progress.SpinnerProgress();
+        btnAsignToDeliver = new utils.Button();
 
         dateStart.setForeground(new java.awt.Color(255, 102, 51));
 
@@ -266,17 +276,17 @@ public class FormQLDonHang extends javax.swing.JPanel {
 
         tbOrder.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Mã đơn hàng", "Trạng thái", "Thông tin giao hàng", "Số lượng sản phẩm", "Điểm đánh giá", "Đánh giá", "Ngày đánh giá", "Mã ưu đãi", "SDT khách hàng", "Ngày đặt"
+                "Mã đơn hàng", "Trạng thái", "PTTT", "Số lượng sản phẩm", "Điểm đánh giá", "Đánh giá", "Ngày đánh giá", "Mã ưu đãi", "Thông tin giao hàng", "SDT khách hàng", "Ngày đặt"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, true, true, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -287,13 +297,13 @@ public class FormQLDonHang extends javax.swing.JPanel {
         tbOrder.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(tbOrder);
 
-        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 1080, 440));
+        add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 1080, 490));
 
         jLabel1.setText("Trạng thái");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 90, -1, 20));
 
         txtOrderId.setEditable(false);
-        add(txtOrderId, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, 200, 30));
+        add(txtOrderId, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 200, 30));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(153, 153, 153));
@@ -348,15 +358,20 @@ public class FormQLDonHang extends javax.swing.JPanel {
         add(btnRefesh, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 160, 150, 40));
 
         jLabel11.setText("Khách hàng:");
-        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, 30));
+        add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, -1, 30));
 
         btnUpdate.setBackground(new java.awt.Color(255, 102, 51));
         btnUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnUpdate.setText("Cập nhật");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
         add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 80, 150, -1));
 
         txtAccountID.setEditable(false);
-        add(txtAccountID, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 90, 200, 30));
+        add(txtAccountID, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 130, 200, 30));
 
         txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -370,20 +385,33 @@ public class FormQLDonHang extends javax.swing.JPanel {
         });
         add(txtSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 16, 320, 30));
 
-        cmbOrderStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Đang thực hiện", "Đã hoàn tất" }));
-        add(cmbOrderStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 140, 200, 30));
+        add(cmbOrderStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 80, 220, 30));
 
         jLabel12.setText("Mã ưu đãi:");
-        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 140, -1, 30));
+        add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, 30));
 
         txtVoucherId.setEditable(false);
-        add(txtVoucherId, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 140, 200, 30));
+        add(txtVoucherId, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 200, 30));
 
         cmbSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tìm theo mã đơn hàng", "Tìm theo SĐT khách hàng" }));
         add(cmbSearchType, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 10, -1, 40));
 
         jLabel2.setText("Mã đơn hàng:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, -1, -1));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
+
+        progressLoading.setForeground(new java.awt.Color(255, 204, 51));
+        progressLoading.setIndeterminate(true);
+        add(progressLoading, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 10, 40, 40));
+
+        btnAsignToDeliver.setBackground(new java.awt.Color(255, 102, 51));
+        btnAsignToDeliver.setForeground(new java.awt.Color(255, 255, 255));
+        btnAsignToDeliver.setText("Giao cho shipper");
+        btnAsignToDeliver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAsignToDeliverActionPerformed(evt);
+            }
+        });
+        add(btnAsignToDeliver, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 130, 160, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void lbExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExit1MouseClicked
@@ -416,6 +444,99 @@ public class FormQLDonHang extends javax.swing.JPanel {
             menu.show(txtSearch, 0, txtSearch.getHeight());
         }
     }//GEN-LAST:event_txtSearchMouseClicked
+    private boolean updateOrderCheck()
+    {
+        String currentOrderStatus=selectedOrder.getOrder().getStatus();
+        String updatedStatus=cmbOrderStatus.getSelectedItem().toString();
+        System.out.println("Trạng thái hiện tại:"+currentOrderStatus+"\nCập nhật "+updatedStatus);
+        if(updatedStatus.equals(currentOrderStatus)) {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Đơn hàng đang ở trạng thái"+currentOrderStatus+"\nKhông thể cập nhật!");
+            return false;
+        }
+
+        if(updatedStatus.equals(OrderStatus.STATUS_PROCESING)) {
+            // Cho phép chuyển về Đang thực hiện từ bất kỳ trạng thái nào  
+            // NGOẠI TRỪ trạng thái Đã hủy hoặc Đã đánh giá
+            if(currentOrderStatus.equals(OrderStatus.STATUS_COMPLETE) 
+                || currentOrderStatus.equals(OrderStatus.STATUS_RATED)) {
+                 Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn không thể thực hiện đơn hàng chưa đã đánh giá hay đã hủy!");
+              return false;
+            }
+        }
+
+        if(updatedStatus.equals(OrderStatus.STATUS_COMPLETE)&&!currentOrderStatus.equals(OrderStatus.STATUS_PROCESING)) 
+        {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn không thể hoàn tất đơn hàng chưa thực hiện hoặc đã đánh giá!");
+            return false;
+        }
+        
+        return true;
+        
+    }
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        if(updateOrderCheck())
+        {
+            int result= JOptionPane.showConfirmDialog(this, "Cập nhật đơn hàng "+selectedOrder.getOrder().getOrderID()+" ?"+"\nTrạng thái : "+cmbOrderStatus.getSelectedItem().toString());
+            if(result==JOptionPane.YES_OPTION)
+            {
+                progressLoading.setVisible(true);
+                SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            updateOrder();
+                            return null;
+                        }
+                        @Override
+                        protected void done() {
+                            progressLoading.setVisible(false);
+                        }
+                    };
+                worker.execute();
+            }
+        }
+    }//GEN-LAST:event_btnUpdateActionPerformed
+    private void checkOrderAndOpenFormDelivery()
+    {
+        ResponseModel response= deliveryController.checkOrder(selectedOrder.getOrder().getOrderID());
+        if(response.getMessage().equals("OK"))
+        {
+            FormDelivery frmDelivery=new FormDelivery(selectedOrder.getOrder());
+            frmDelivery.setVisible(true);
+            frmDelivery.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                FormQLDonHang.this.getAllOrders();
+                FormQLDonHang.this.refesh();
+            }
+        });
+        }
+        else
+        {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Đơn hàng đã được giao cho một shipper khác!");
+        }
+    }
+    private void btnAsignToDeliverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignToDeliverActionPerformed
+        if(selectedOrder!=null)
+        {
+            progressLoading.setVisible(true);
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    checkOrderAndOpenFormDelivery();
+                    return null;
+                }
+                @Override
+                protected void done() {
+                    progressLoading.setVisible(false);
+                }
+            };
+            worker.execute();
+        }
+        else
+        {
+             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn chưa chọn đơn hàng!");
+        }
+    }//GEN-LAST:event_btnAsignToDeliverActionPerformed
     private List<DataSearch> search(String search) {
         int limitData = 7;
         List<DataSearch> list = new ArrayList<>();
@@ -447,6 +568,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
      
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private utils.Button btnAsignToDeliver;
     private utils.Button btnRefesh;
     private utils.Button btnShowDetails;
     private utils.Button btnUpdate;
@@ -464,6 +586,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbExit1;
+    private utils.spinner_progress.SpinnerProgress progressLoading;
     private javax.swing.JTable tbOrder;
     private javax.swing.JTextField txtAccountID;
     private javax.swing.JTextField txtOrderId;

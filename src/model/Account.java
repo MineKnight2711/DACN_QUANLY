@@ -14,10 +14,13 @@ public class Account {
 
     private String accountID;
     private String fullName;
+    private String gender;
     private String email;
+    private String password;
     private String phoneNumber;
     private String imageUrl;
     private String tier;
+    private String role;
     private Date birthday;
 
 
@@ -51,12 +54,36 @@ public class Account {
         this.fullName = fullName;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhoneNumber() {

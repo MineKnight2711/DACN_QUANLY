@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class OrderDTO {
     private Orders order;
+    private String paymentMethod;
     private List<DetailsDTO> detailList;
 
     public OrderDTO() {
@@ -25,6 +26,14 @@ public class OrderDTO {
         this.order = order;
     }
 
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+    
     public List<DetailsDTO> getDetailList() {
         return detailList;
     }

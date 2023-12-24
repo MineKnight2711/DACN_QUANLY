@@ -10,22 +10,22 @@ import java.awt.Font;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import forms.LoginForm;
+import model.AccountSession;
 import raven.toast.Notifications;
 
 public class Application extends javax.swing.JFrame {
 
     private static Application app;
-    private final MainForm mainForm;
+    private static MainForm mainForm;
     private final LoginForm loginForm;
 
     public Application() {
         initComponents();
         setSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
-        mainForm = new MainForm();
         loginForm = new LoginForm();
 
-        setContentPane(mainForm);
+        setContentPane(loginForm);
         
         Notifications.getInstance().setJFrame(this);
     }
@@ -35,13 +35,14 @@ public class Application extends javax.swing.JFrame {
         app.mainForm.showForm(component);
     }
 
-    public static void login() {
+    public static void login(AccountSession account) {
+        mainForm=new MainForm(account);
         FlatAnimatedLafChange.showSnapshot();
-        app.setContentPane(app.mainForm);
-        app.mainForm.applyComponentOrientation(app.getComponentOrientation());
+        app.setContentPane(Application.mainForm);
+        Application.mainForm.applyComponentOrientation(app.getComponentOrientation());
         setSelectedMenu(0, 0);
-        app.mainForm.hideMenu();
-        SwingUtilities.updateComponentTreeUI(app.mainForm);
+        Application.mainForm.hideMenu();
+        SwingUtilities.updateComponentTreeUI(Application.mainForm);
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 

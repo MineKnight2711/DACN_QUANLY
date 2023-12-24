@@ -3,27 +3,18 @@ package forms;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.font.TextAttribute;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.text.StyleContext;
+import model.AccountSession;
 
 
 /**
@@ -31,11 +22,12 @@ import javax.swing.text.StyleContext;
  * @author Raven
  */
 public class FormDashboard extends javax.swing.JPanel {
+    private AccountSession currentAccount;
     private Image backgroundImage;
 
-    public FormDashboard() {
+    public FormDashboard(AccountSession account) {
         setLayout(new BorderLayout());
-
+        this.currentAccount=account;
         // Load the background image
         backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
 
@@ -51,17 +43,17 @@ public class FormDashboard extends javax.swing.JPanel {
 
         add(backgroundPanel, BorderLayout.CENTER);
 
-        addLabel(backgroundPanel);
+        addLabel(backgroundPanel,currentAccount.getLoggedInAccount().getFullName());
         addCloseButton(backgroundPanel);
     }
 
-    private void addLabel(JPanel backgroundPanel) {
+    private void addLabel(JPanel backgroundPanel,String accountName) {
         JPanel labelsPanel = new JPanel();
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
         labelsPanel.setOpaque(false);
 
-        JLabel welcomeLabel = new JLabel("Chào mừng trở lại, Staff name!");
-        JLabel wishLabel = new JLabel("Chúc 1 ngày làm việc tốt lành.");
+        JLabel welcomeLabel = new JLabel("Chào mừng trở lại, "+accountName+"!");
+        JLabel wishLabel = new JLabel("Chúc một ngày làm việc tốt lành.");
 
         // Set font styles if needed
         Font segoeScriptFont = createFont("Segoe Script",Font.PLAIN,24);

@@ -182,7 +182,11 @@ public class FormDish extends javax.swing.JPanel {
         };
         tbDish.getColumnModel().getColumn(6).setCellRenderer(new TableActionCellRender());
         tbDish.getColumnModel().getColumn(6).setCellEditor(new TableActionCellEditor(event));
-        for (int i = 0; i <= 4; i++) {
+        centeredTableColumn();
+    }
+    private void centeredTableColumn()
+    {
+        for (int i = 0; i <=5; i++) {
             tbDish.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable jtable, Object o, boolean bln, boolean bln1, int i, int i1) {

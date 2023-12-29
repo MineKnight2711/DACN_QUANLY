@@ -199,7 +199,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
                 tbOrder.setRowSorter(new TableRowSorter<>(model));
                 tbOrder.setRowHeight(50);
         } else {
-            JOptionPane.showMessageDialog(this, "Không có danh mục nào!", "Lỗi", 0);
+            JOptionPane.showMessageDialog(this, "Không có đơn hàng nào!", "Lỗi", 0);
         }
     }
 
@@ -448,30 +448,7 @@ public class FormQLDonHang extends javax.swing.JPanel {
     {
         String currentOrderStatus=selectedOrder.getOrder().getStatus();
         String updatedStatus=cmbOrderStatus.getSelectedItem().toString();
-        System.out.println("Trạng thái hiện tại:"+currentOrderStatus+"\nCập nhật "+updatedStatus);
-        if(updatedStatus.equals(currentOrderStatus)) {
-            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Đơn hàng đang ở trạng thái"+currentOrderStatus+"\nKhông thể cập nhật!");
-            return false;
-        }
-
-        if(updatedStatus.equals(OrderStatus.STATUS_PROCESING)) {
-            // Cho phép chuyển về Đang thực hiện từ bất kỳ trạng thái nào  
-            // NGOẠI TRỪ trạng thái Đã hủy hoặc Đã đánh giá
-            if(currentOrderStatus.equals(OrderStatus.STATUS_COMPLETE) 
-                || currentOrderStatus.equals(OrderStatus.STATUS_RATED)) {
-                 Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn không thể thực hiện đơn hàng chưa đã đánh giá hay đã hủy!");
-              return false;
-            }
-        }
-
-        if(updatedStatus.equals(OrderStatus.STATUS_COMPLETE)&&!currentOrderStatus.equals(OrderStatus.STATUS_PROCESING)) 
-        {
-            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn không thể hoàn tất đơn hàng chưa thực hiện hoặc đã đánh giá!");
-            return false;
-        }
-        
-        return true;
-        
+        return updatedStatus.equals(OrderStatus.STATUS_PAID)&&currentOrderStatus.equals("Chờ thanh toán");
     }
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         if(updateOrderCheck())
@@ -518,23 +495,29 @@ public class FormQLDonHang extends javax.swing.JPanel {
     private void btnAsignToDeliverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignToDeliverActionPerformed
         if(selectedOrder!=null)
         {
-            progressLoading.setVisible(true);
-            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    checkOrderAndOpenFormDelivery();
-                    return null;
+            if(updateOrderCheck()){
+                progressLoading.setVisible(true);
+                SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            checkOrderAndOpenFormDelivery();
+                            return null;
+                        }
+                        @Override
+                        protected void done() {
+                            progressLoading.setVisible(false);
+                        }
+                    };
+                    worker.execute();
                 }
-                @Override
-                protected void done() {
-                    progressLoading.setVisible(false);
-                }
-            };
-            worker.execute();
+            else
+            {
+                Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn chỉ có thể giao đơn đã thanh toán hoặc chờ thanh toán COD!");
+                 
+            }
         }
-        else
-        {
-             Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn chưa chọn đơn hàng!");
+        else{       
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Bạn chưa chọn đơn hàng!");
         }
     }//GEN-LAST:event_btnAsignToDeliverActionPerformed
     private List<DataSearch> search(String search) {

@@ -2,6 +2,7 @@ package forms;
 
 import controller.AccountController;
 import application.Application;
+import java.awt.event.KeyEvent;
 import model.AccountSession;
 import model.ResponseModel;
 import raven.toast.Notifications;
@@ -58,9 +59,7 @@ public class LoginForm extends javax.swing.JPanel {
         txtPass = new javax.swing.JPasswordField();
         disable = new javax.swing.JLabel();
         show = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
         btnLogin = new javax.swing.JButton();
-        jLabel11 = new javax.swing.JLabel();
         pnBannel = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         lbLoginIcon = new javax.swing.JLabel();
@@ -95,6 +94,11 @@ public class LoginForm extends javax.swing.JPanel {
         txtEmail.setFont(txtEmail.getFont().deriveFont(txtEmail.getFont().getSize()+2f));
         txtEmail.setForeground(new java.awt.Color(51, 51, 51));
         txtEmail.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        txtEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                loginKeyPressed(evt);
+            }
+        });
         pnLoginInfo.add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, 360, 30));
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -109,6 +113,11 @@ public class LoginForm extends javax.swing.JPanel {
         txtPass.setForeground(new java.awt.Color(102, 102, 102));
         txtPass.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         txtPass.setCaretColor(new java.awt.Color(255, 255, 255));
+        txtPass.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                loginKeyPressed(evt);
+            }
+        });
         pnLoginInfo.add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 360, 30));
 
         disable.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -129,10 +138,6 @@ public class LoginForm extends javax.swing.JPanel {
         });
         pnLoginInfo.add(show, new org.netbeans.lib.awtextra.AbsoluteConstraints(335, 216, 40, 40));
 
-        jCheckBox1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jCheckBox1.setText("Remember Password");
-        pnLoginInfo.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(34, 261, -1, -1));
-
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnLogin.setForeground(new java.awt.Color(102, 102, 102));
         btnLogin.setText("LOGIN");
@@ -144,12 +149,6 @@ public class LoginForm extends javax.swing.JPanel {
             }
         });
         pnLoginInfo.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 310, 341, 40));
-
-        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel11.setText("Forgot Password?");
-        jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        pnLoginInfo.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 260, 121, 27));
 
         add(pnLoginInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 140, -1, 440));
 
@@ -228,6 +227,12 @@ public class LoginForm extends javax.swing.JPanel {
     private void lbExitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbExitMouseClicked
         System.exit(0);
     }//GEN-LAST:event_lbExitMouseClicked
+
+    private void loginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_loginKeyPressed
+       if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+             btnLogin.doClick();
+        }
+    }//GEN-LAST:event_loginKeyPressed
 
 //    private class LoginFormLayout implements LayoutManager {
 //
@@ -340,8 +345,6 @@ public class LoginForm extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
     private javax.swing.JLabel disable;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

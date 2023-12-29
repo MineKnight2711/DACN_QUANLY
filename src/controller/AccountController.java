@@ -75,4 +75,18 @@ public class AccountController {
 //    public String deleteStaff(String accountID) {
 //        
 //    }
+
+    public ResponseModel updateAccount(Account selectedAccount) {
+        ResponseModel responseModel=new ResponseModel();
+        try {
+            
+            String apiResult=accountAPI.updateAccount(jsonHandle.toJson(selectedAccount));
+            responseModel=jsonHandle.getResponseFromJson(apiResult);
+            return responseModel;
+        } catch (IOException|InterruptedException ex) {
+            ex.printStackTrace();
+            responseModel.setMessage("Fail");
+            return responseModel;
+        }
+    }
 }

@@ -29,7 +29,7 @@ public class FormDashboard extends javax.swing.JPanel {
         setLayout(new BorderLayout());
         this.currentAccount=account;
         // Load the background image
-        backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
+        backgroundImage = new ImageIcon("src\\image\\background_2.jpg").getImage();
 
         // Create a panel for the background image
         JPanel backgroundPanel = new JPanel() {
@@ -61,9 +61,9 @@ public class FormDashboard extends javax.swing.JPanel {
 
         welcomeLabel.setFont(segoeScriptFont);
         wishLabel.setFont(segoeScriptFont);
-        welcomeLabel.setForeground(Color.YELLOW);
-        wishLabel.setForeground(Color.YELLOW);
-        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcomeLabel.setForeground(Color.BLACK);
+        wishLabel.setForeground(Color.BLACK);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT-Float.parseFloat("0.4"));
         wishLabel.setAlignmentX(Component.CENTER_ALIGNMENT-Float.parseFloat("0.2"));
         // Add welcomeLabel to the NORTH of labelsPanel
         labelsPanel.add(welcomeLabel, BorderLayout.NORTH);

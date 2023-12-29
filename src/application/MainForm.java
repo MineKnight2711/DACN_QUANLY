@@ -32,7 +32,7 @@ public class MainForm extends JLayeredPane {
     private Image backgroundImage;
     public MainForm(AccountSession account) {
         this.currentAccount=account;
-        backgroundImage = new ImageIcon("src\\image\\coffee.jpg").getImage();
+        backgroundImage = new ImageIcon("src\\image\\background_2.jpg").getImage();
         init();
     }
     private void init() {

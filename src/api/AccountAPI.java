@@ -13,9 +13,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -211,5 +215,20 @@ public class AccountAPI {
             e.printStackTrace();
             return "Fail";
         } 
+    }
+
+    public String updateAccount(String acc) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+  
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(BaseURL.BASE_URL+"account/update-staff"))
+          .PUT(HttpRequest.BodyPublishers.ofString(acc))
+          .header("Content-Type", "application/json")
+          .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+  
+        return response.body();
+
     }
 }

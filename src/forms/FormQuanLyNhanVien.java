@@ -38,6 +38,7 @@ import utils.table.TableActionEvent;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import model.Account;
+import model.Category;
 import model.ResponseModel;
 import utils.ImagePreviewLabel;
 
@@ -53,6 +54,7 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     private PanelSearch search;
     private boolean isAddEnabled,isEditingEnabled = false;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    private Account selectedAccount;
     public FormQuanLyNhanVien() {
         initComponents();
         iniSearchTextFieldColumn();
@@ -81,7 +83,7 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
                 menu.setVisible(false);
                 txtSearch.setText(data.getText());
                 
-                System.out.println("Click Item : " + data.getText());
+                
             }
 
             @Override
@@ -275,7 +277,7 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
                     isEditingEnabled=false;
                     enableEdit();
                     try {
-                        Account selectedAccount = accounts.get(modelRowIndex);
+                        selectedAccount = accounts.get(modelRowIndex);
                         txtIDEmployee.setText(selectedAccount.getAccountID());
                         txtEmployeeName.setText(selectedAccount.getFullName());
                         txtEmail.setText(selectedAccount.getEmail());
@@ -683,9 +685,39 @@ public class FormQuanLyNhanVien extends javax.swing.JPanel {
     private void btnRefeshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefeshActionPerformed
         refesh();
     }//GEN-LAST:event_btnRefeshActionPerformed
+    private void updateAccount(){
+        if(selectedAccount!=null)
+            {
+                Account updatedAccount=selectedAccount;
+                updatedAccount.setFullName(txtEmployeeName.getText());
+                updatedAccount.setBirthday(birthDayChooser.getSelectedDate());
+                updatedAccount.setPhoneNumber(txtPhoneNumber.getText());
 
+                ResponseModel result=accountController.updateAccount(selectedAccount);
+
+                if(result.getMessage().equals("Success")){
+                    Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, "Cập nhật nhân viên thành công!");
+                    refesh(); 
+                }
+                else{
+                    Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Có lỗi xảy ra");
+                }
+            }
+    }
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
+        progressLoading.setVisible(true);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    updateAccount();
+                    return null;
+                }
+                @Override
+                protected void done() {
+                    progressLoading.setVisible(false);
+                }
+            };
+        worker.execute();
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnChooseBirthDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseBirthDayActionPerformed
